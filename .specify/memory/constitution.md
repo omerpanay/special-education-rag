@@ -262,7 +262,7 @@ Her PR merge edilmeden önce şu kontroller geçmek ZORUNDADIR:
   2. Etki analizi yapılmalı (hangi modüller etkilenir?)
   3. Semantic versioning ile versiyon güncellenmeli
   4. Tüm bağımlı template'ler senkronize edilmeli
-- Versiyon yönetimi:
+- Versiyon yöneti:
   - **MAJOR**: İlke kaldırma veya köklü yeniden tanımlama
   - **MINOR**: Yeni ilke/bölüm ekleme veya genişletme
   - **PATCH**: İfade düzeltmeleri, typo, açıklama ekleme

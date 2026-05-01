@@ -1,0 +1,89 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edurag-backend"
+version = "0.1.0"
+description = "EduRAG — Özel Eğitim RAG Platformu Backend"
+requires-python = ">=3.11"
+dependencies = [
+    # Web framework — async-first, Pydantic entegrasyonu
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+
+    # ORM — async SQLAlchemy + PostgreSQL driver
+    "sqlalchemy[asyncio]>=2.0.25",
+    "asyncpg>=0.29.0",
+
+    # Validation — strict type safety (constitution ilkesi IV)
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.1.0",
+
+    # LangChain — RAG orkestrasyonu
+    "langchain>=0.3.0",
+    "langchain-groq>=0.2.0",
+    "langchain-community>=0.3.0",
+
+    # Embedding — multilingual-e5-large modeli için
+    "sentence-transformers>=3.0.0",
+
+    # pgvector — SQLAlchemy vektör column desteği
+    "pgvector>=0.3.0",
+
+    # PDF parsing — kaynak yükleme pipeline
+    "pypdf>=4.0.0",
+
+    # Auth — JWT token yönetimi + şifre hash
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+
+    # File upload — multipart form data desteği
+    "python-multipart>=0.0.9",
+
+    # Logging — yapılandırılmış JSON loglama
+    "structlog>=24.1.0",
+
+    # Database migration
+    "alembic>=1.13.0",
+
+    # HTTP client — dış servis çağrıları
+    "httpx>=0.27.0",
+
+    # .env dosyası okuma (pydantic-settings ve alembic env.py için)
+    "python-dotenv>=1.0.0",
+
+    # email validation (Pydantic EmailStr için)
+    "email-validator>=2.1.0",
+]
+
+# Setuptools'a sadece 'app' paketini dahil etmesini söylüyoruz
+# Yoksa 'alembic' klasörünü de paket sanıp hata veriyor
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.27.0",
+    "mypy>=1.8.0",
+    "ruff>=0.2.0",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

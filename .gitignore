@@ -1,10 +1,55 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+# ============================================
+# EduRAG — .gitignore
+# ============================================
 
-# Virtual environments
-.venv
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Node (frontend)
+node_modules/
+frontend/dist/
+frontend/build/
+
+# Logs
+*.log
+
+# Unity WebGL builds (büyük dosyalar)
+game/Build/*.data
+game/Build/*.wasm
+
+# Alembic
+*.pyc
+
+# Spec Kit
+.specify/feature.json
