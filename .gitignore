@@ -53,3 +53,4 @@ game/Build/*.wasm
 
 # Spec Kit
 .specify/feature.json
+Sources/
