@@ -18,6 +18,7 @@ class QueryRequest(BaseModel):
     student_id: Optional[UUID] = Field(None, description="Hangi öğrenci için soruluyor?")
     disability_type: Optional[str] = Field(None, description="Engel türü (Otizm, Disleksi vb.)")
     grade_level: Optional[int] = Field(None, ge=1, le=12, description="Sınıf seviyesi (1-12)")
+    conversation_id: Optional[UUID] = Field(None, description="Devam eden konuşma ID'si")
 
 
 class Citation(BaseModel):
@@ -41,5 +42,6 @@ class QueryResponse(BaseModel):
     # Observability
     total_latency_ms: Optional[float] = None
     created_at: datetime
+    conversation_id: Optional[str] = Field(None, description="İlişkili konuşma ID'si")
 
     model_config = ConfigDict(from_attributes=True)

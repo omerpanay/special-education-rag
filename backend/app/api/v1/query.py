@@ -36,4 +36,5 @@ async def ask_question(
         db=db,
         request=request,
         teacher_id=current_teacher.id,
+        conversation_id=request.conversation_id,
     )

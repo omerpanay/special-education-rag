@@ -23,13 +23,14 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,  # DATABASE_URL = database_url
+        extra="ignore",        # Pydantic v2 .env'deki fazla değişkenlere kızmasın diye
     )
 
     # ── Veritabanı ──
     database_url: str = "postgresql+asyncpg://postgres:sifrem123@localhost:5433/edurag"
 
     # ── LLM (Groq) ──
-    groq_api_key: str = ""
+    groq_api_key: str
     llm_model: str = "llama-3.3-70b-versatile"
 
     # ── Embedding ──

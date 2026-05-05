@@ -35,7 +35,7 @@ from uuid import UUID
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
-from sqlalchemy import func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -97,6 +97,17 @@ async def ingest_pdf(
     """
     file_hash = calculate_file_hash(file_path)
 
+    # ── Duplikasyon Kontrolü (Idempotency) ──
+    # Aynı PDF daha önce yüklenmişse tekrar işleme. Mevcut kaydı döndür.
+    # Production'da bu önemli: Kullanıcı yanlışlıkla aynı dosyayı iki kez
+    # sürüklerse veya retry mekanizması tetiklenirse sistem çökmemeli.
+    existing = await db.execute(
+        select(AcademicSource).where(AcademicSource.file_hash == file_hash)
+    )
+    existing_source = existing.scalar_one_or_none()
+    if existing_source is not None:
+        return existing_source
+
     # ── ADIM 1: Kaynak kaydı oluştur ──
     source = AcademicSource(
         title=title,
@@ -129,12 +140,20 @@ async def ingest_pdf(
     #
     # separators sırası: Önce paragraf (\n\n), sonra satır (\n),
     # sonra cümle (.), sonra kelime ( ), en son karakter bazlı
+    # PostgreSQL '\x00' (null byte) karakterini desteklemez, temizleyelim
+    for doc in docs:
+        if doc.page_content:
+            doc.page_content = doc.page_content.replace("\x00", "")
+
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
         separators=["\n\n", "\n", ".", " ", ""],
     )
     chunks = text_splitter.split_documents(docs)
+
+    # Boş chunk'ları filtrele (Embedding modelinin hata vermesini önler)
+    chunks = [chunk for chunk in chunks if chunk.page_content and chunk.page_content.strip()]
 
     # ── ADIM 4: Parçalar → Vektörler (Embedding) ──
     # SentenceTransformer.encode() batch olarak çalışır
@@ -172,4 +191,3 @@ async def ingest_pdf(
     await db.refresh(source)
 
     return source
-"""

@@ -32,6 +32,7 @@ ile farklı kaynaklardan sonuçları öne çıkarırız.
 from typing import List, Tuple
 
 from sqlalchemy import desc, func, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -94,6 +95,7 @@ async def retrieve_hybrid_chunks(
     # limit * 2 çekiyoruz çünkü MMR filtresi bazılarını eleyecek
     stmt = (
         select(SourceChunk, combined_score)
+        .options(selectinload(SourceChunk.source))
         .where(cosine_sim >= threshold)
         .order_by(desc("score"))
         .limit(limit * 2)

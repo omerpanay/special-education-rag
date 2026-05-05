@@ -32,6 +32,11 @@ from app.models.academic_source import AcademicSource  # noqa: F401
 from app.models.source_chunk import SourceChunk  # noqa: F401
 from app.models.rag_response import RagResponse  # noqa: F401
 from app.models.response_chunk import ResponseChunk  # noqa: F401
+from app.models.student import Student  # noqa: F401
+from app.models.feedback import Feedback  # noqa: F401
+from app.models.iep_draft import IEPDraft  # noqa: F401
+from app.models.conversation import Conversation, ConversationMessage  # noqa: F401
+from app.models.consent import Consent  # noqa: F401
 
 target_metadata = Base.metadata
 

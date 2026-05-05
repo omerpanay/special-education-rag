@@ -61,8 +61,10 @@ HUMAN_TEMPLATE = """Öğretmenin Sorusu: {question}
 Ek Bağlam Bilgileri:
 Engel Türü: {disability_type}
 Sınıf Seviyesi: {grade_level}
-
+{student_context}
 Lütfen sadece yukarıdaki BAĞLAM'a dayanarak yanıtla. Eğer bağlamda yoksa uydurma.
+Eğer öğrenci profil bağlamı verilmişse, yanıtını o öğrencinin mevcut seviyesine \
+ve ihtiyaçlarına göre KİŞİSELLEŞTİR.
 """
 
 

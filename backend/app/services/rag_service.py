@@ -1,32 +1,31 @@
 """RAG Core Servisi — Soru Cevaplama Orkestratörü.
 
 ─── MİMARİ KARAR: Bu servis neden en karmaşık? ───
-Çünkü 3 farklı sistemi koordine eder:
+Çünkü 4 farklı sistemi koordine eder:
 1. Retrieval: Veritabanında hibrit arama yap
-2. Generation: Bulunan bağlamı LLM'e gönder, yanıt al
-3. Observability: Her adımın süresini ölç ve kaydet
-
-─── OBSERVABILITY (GÖZLEMLENEBİLİRLİK) NEDEN ÖNEMLİ? ───
-Production'da "sistem yavaş" diye şikayet geldiğinde
-darboğazın nerede olduğunu bilmen lazım:
-  - Retrieval mı yavaş? → DB index'leri kontrol et
-  - LLM mi yavaş? → Model değiştir veya cache ekle
-  - Toplam mı yavaş? → İkisini de optimize et
-
-Her soru-cevap etkileşimi DB'ye kaydedilir (RagResponse tablosu).
-Bu sayede dashboard'da metrikler gösterilebilir.
+2. Context Building: Öğrenci profili + konuşma geçmişi
+3. Generation: Bulunan bağlamı LLM'e gönder, yanıt al
+4. Observability: Her adımın süresini ölç ve kaydet
 """
 
+import logging
 import time
+from typing import Optional
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from app.models.conversation import Conversation, ConversationMessage
 from app.models.rag_response import RagResponse
 from app.models.response_chunk import ResponseChunk
 from app.rag.chain import create_rag_chain
+from app.rag.context_builder import ContextBuilder
 from app.rag.retrieval import retrieve_hybrid_chunks
 from app.schemas.query import Citation, QueryRequest, QueryResponse
+
+logger = logging.getLogger("edurag.rag")
 
 
 class RagService:
@@ -37,6 +36,7 @@ class RagService:
         db: AsyncSession,
         request: QueryRequest,
         teacher_id: UUID,
+        conversation_id: Optional[UUID] = None,
     ) -> QueryResponse:
         """Kullanıcının sorusuna RAG ile cevap üret.
 
@@ -73,6 +73,40 @@ class RagService:
             else "Hiçbir akademik kaynak bulunamadı."
         )
 
+        # ── 2.5 ADAPTIVE CONTEXT (Kişiselleştirme) ──
+        # student_id verilmişse öğrenci bağlamını oluştur
+        student_context = ""
+        if request.student_id:
+            student_context = await ContextBuilder.build_student_context(
+                db=db,
+                student_id=request.student_id,
+                teacher_id=teacher_id,
+            )
+            if student_context:
+                student_context = (
+                    "\nÖğrenci Profil Bağlamı:\n"
+                    + student_context
+                )
+
+        # ── 2.7 CONVERSATION HISTORY (Multi-Turn) ──
+        conversation_context = ""
+        conversation = None
+        if conversation_id:
+            conversation = await _get_conversation(db, conversation_id, teacher_id)
+            if conversation and conversation.messages:
+                history_parts = []
+                # Son 5 mesajı al
+                recent = conversation.messages[-10:]  # 5 çift (user+assistant)
+                for msg in recent:
+                    role_label = "Öğretmen" if msg.role == "user" else "Asistan"
+                    history_parts.append(f"{role_label}: {msg.content}")
+                if history_parts:
+                    conversation_context = (
+                        "\n### KONUŞMA GEÇMİŞİ ###\n"
+                        + "\n".join(history_parts)
+                        + "\n### GEÇMİŞ BİTİŞİ ###\n"
+                    )
+
         # ── 3. GENERATION ──
         # Chunk yoksa LLM'i çağırma bile → direkt fallback
         if not chunks_with_scores:
@@ -90,6 +124,7 @@ class RagService:
                     str(request.grade_level) if request.grade_level
                     else "Belirtilmedi"
                 ),
+                "student_context": student_context + conversation_context,
             })
 
         t2 = time.time()
@@ -136,12 +171,65 @@ class RagService:
         await db.commit()
         await db.refresh(rag_response)
 
-        # ── 5. RETURN ──
+        # ── 5. CONVERSATION PERSISTENCE ──
+        response_uuid = UUID(str(rag_response.id))
+        if conversation_id and conversation:
+            # Mevcut konuşmaya mesaj ekle
+            db.add(ConversationMessage(
+                conversation_id=conversation.id,
+                role="user",
+                content=request.query,
+            ))
+            db.add(ConversationMessage(
+                conversation_id=conversation.id,
+                role="assistant",
+                content=answer,
+                rag_response_id=str(response_uuid),
+            ))
+            await db.commit()
+
+        # ── 6. RETURN ──
         return QueryResponse(
-            id=UUID(str(rag_response.id)),
+            id=response_uuid,
             answer=answer,
             citations=citations,
             is_fallback=is_fallback,
             total_latency_ms=total_latency,
             created_at=rag_response.created_at,
+            conversation_id=str(conversation.id) if conversation else None,
         )
+
+    @staticmethod
+    async def create_conversation(
+        db: AsyncSession,
+        teacher_id: UUID,
+        title: str,
+        student_id: Optional[UUID] = None,
+    ) -> Conversation:
+        """Yeni konuşma oluştur."""
+        conv = Conversation(
+            teacher_id=teacher_id,
+            student_id=student_id,
+            title=title[:100],  # Başlık max 100 karakter
+        )
+        db.add(conv)
+        await db.commit()
+        await db.refresh(conv)
+        return conv
+
+
+async def _get_conversation(
+    db: AsyncSession,
+    conversation_id: UUID,
+    teacher_id: UUID,
+) -> Optional[Conversation]:
+    """Konuşmayı mesajlarıyla birlikte getir."""
+    result = await db.execute(
+        select(Conversation)
+        .options(selectinload(Conversation.messages))
+        .where(
+            Conversation.id == conversation_id,
+            Conversation.teacher_id == teacher_id,
+        )
+    )
+    return result.scalar_one_or_none()
