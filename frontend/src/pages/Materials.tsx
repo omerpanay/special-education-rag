@@ -13,16 +13,20 @@ interface Student {
 }
 
 const DISABILITY_LABELS: Record<string, string> = {
-  disleksi: 'Disleksi', otizm: 'Otizm Spektrum', zihin_yetersizligi: 'Zihinsel Yetersizlik',
-  isitme: 'İşitme Yetersizliği', bedensel: 'Bedensel Yetersizlik', dehb: 'DEHB',
+  disleksi: 'Dyslexia',
+  otizm: 'Autism Spectrum',
+  zihin_yetersizligi: 'Intellectual Disability',
+  isitme: 'Hearing Impairment',
+  bedensel: 'Physical Disability',
+  dehb: 'ADHD',
 };
 
 const PROGRESS_MESSAGES = [
-  'Hikaye yazılıyor...',
-  'Görsel promptlar oluşturuluyor...',
-  'Görseller HuggingFace ile üretiliyor...',
-  'PDF hazırlanıyor...',
-  'Son dokunuşlar yapılıyor...',
+  'Writing the story...',
+  'Generating visual prompts...',
+  'Creating images with HuggingFace FLUX.1...',
+  'Building the PDF...',
+  'Final touches...',
 ];
 
 export default function Materials() {
@@ -61,7 +65,7 @@ export default function Materials() {
     try {
       const mats = await getStudentMaterials(studentId);
       setHistory(Array.isArray(mats) ? mats : []);
-    } catch { /* sessiz */ }
+    } catch { /* silent */ }
     setHistoryLoading(false);
   };
 
@@ -103,15 +107,14 @@ export default function Materials() {
       loadHistory(selectedStudent);
     } catch (err: unknown) {
       stopProgressAnimation();
-      setError(err instanceof Error ? err.message : 'Materyal üretilemedi');
+      setError(err instanceof Error ? err.message : 'Material generation failed');
     }
     setGenerating(false);
   };
 
-  // Windows absolute path'i URL'ye çevir: C:\...\scene_1.png → /static/materials/{id}/scene_1.png
+  // Convert Windows absolute path to static URL
   const toStaticUrl = (imagePath: string | undefined): string | null => {
     if (!imagePath) return null;
-    // Dosya adını çıkar
     const parts = imagePath.replace(/\\/g, '/').split('/');
     const filename = parts[parts.length - 1];
     const materialId = parts[parts.length - 2];
@@ -135,22 +138,22 @@ export default function Materials() {
       <div className="page-header">
         <h2>
           <Sparkles size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />
-          Materyal Üretici
+          Material Generator
         </h2>
-        <p>Öğrencinin ilgi alanına göre kişiselleştirilmiş sosyal öykü üretin</p>
+        <p>Generate personalized social stories based on each student's interests</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: 24 }}>
-        {/* Sol: Form */}
+        {/* Left: Form */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="card">
-            <h3 style={{ fontSize: '1rem', marginBottom: 20 }}>Materyal Parametreleri</h3>
+            <h3 style={{ fontSize: '1rem', marginBottom: 20 }}>Generation Parameters</h3>
 
             <form onSubmit={handleGenerate} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {/* Öğrenci */}
+              {/* Student */}
               <div>
                 <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-                  Öğrenci
+                  Student
                 </label>
                 <select
                   value={selectedStudent}
@@ -173,16 +176,16 @@ export default function Materials() {
                 </select>
               </div>
 
-              {/* İlgi Alanı */}
+              {/* Interest Topic */}
               <div>
                 <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-                  İlgi Alanı / Konu
+                  Interest Topic
                 </label>
                 <input
                   type="text"
                   value={interestTopic}
                   onChange={e => setInterestTopic(e.target.value)}
-                  placeholder="Örn: Uzay ve Gezegenler, Dinozorlar, Kedi ve Köpekler"
+                  placeholder="E.g.: Space & Planets, Dinosaurs, Animals & Nature"
                   style={{
                     width: '100%', padding: '10px 14px',
                     background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
@@ -192,10 +195,10 @@ export default function Materials() {
                 />
               </div>
 
-              {/* Sahne Sayısı */}
+              {/* Scene Count */}
               <div>
                 <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Sahne Sayısı</span>
+                  <span>Number of Scenes</span>
                   <span style={{ color: 'var(--color-primary-light)', fontWeight: 700 }}>{sceneCount}</span>
                 </label>
                 <input
@@ -207,12 +210,12 @@ export default function Materials() {
                   style={{ width: '100%', accentColor: 'var(--color-primary)' }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                  <span>2 sahne (~12sn)</span>
-                  <span>6 sahne (~35sn)</span>
+                  <span>2 scenes (~12s)</span>
+                  <span>6 scenes (~35s)</span>
                 </div>
               </div>
 
-              {/* Materyal Türü */}
+              {/* Material Type Badge */}
               <div style={{
                 padding: '10px 14px', borderRadius: 8,
                 background: 'var(--color-primary-light)15',
@@ -220,10 +223,10 @@ export default function Materials() {
               }}>
                 <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary-light)' }}>
                   <BookOpen size={14} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-                  Sosyal Öykü
+                  Social Story
                 </div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                  HuggingFace FLUX.1 ile görsel üretimi dahil
+                  Includes AI-generated illustrations via HuggingFace FLUX.1
                 </div>
               </div>
 
@@ -234,21 +237,21 @@ export default function Materials() {
                 style={{ width: '100%', justifyContent: 'center' }}
               >
                 {generating ? (
-                  <><div className="spinner" style={{ width: 16, height: 16, marginRight: 8 }} />Üretiliyor...</>
+                  <><div className="spinner" style={{ width: 16, height: 16, marginRight: 8 }} />Generating...</>
                 ) : (
-                  <><Sparkles size={16} />Materyal Üret</>
+                  <><Sparkles size={16} />Generate Material</>
                 )}
               </button>
             </form>
           </div>
 
-          {/* Geçmiş Materyaller */}
+          {/* Previous Materials */}
           <div className="card">
-            <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>Önceki Materyaller</h3>
+            <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>Previous Materials</h3>
             {historyLoading ? (
               <div className="loading-container"><div className="spinner" /></div>
             ) : history.length === 0 ? (
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Henüz materyal yok.</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>No materials generated yet.</div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {history.slice(0, 6).map(mat => (
@@ -264,7 +267,7 @@ export default function Materials() {
                   >
                     <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{mat.title}</div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 3 }}>
-                      {mat.content?.scenes?.length ?? 0} sahne · {new Date(mat.created_at).toLocaleDateString('tr-TR')}
+                      {mat.content?.scenes?.length ?? 0} scenes · {new Date(mat.created_at).toLocaleDateString('en-US')}
                     </div>
                   </div>
                 ))}
@@ -273,7 +276,7 @@ export default function Materials() {
           </div>
         </div>
 
-        {/* Sağ: Sonuç Alanı */}
+        {/* Right: Result Area */}
         <div>
           {/* Progress Bar */}
           {generating && (
@@ -293,12 +296,12 @@ export default function Materials() {
                 }} />
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                HuggingFace FLUX.1-schnell ile görsel üretimi yapılıyor. Bu işlem 20-30 saniye sürebilir.
+                Generating illustrations with HuggingFace FLUX.1-schnell. This may take 20–30 seconds.
               </div>
             </div>
           )}
 
-          {/* Hata */}
+          {/* Error */}
           {error && !generating && (
             <div style={{
               padding: '14px 18px', borderRadius: 'var(--radius-sm)', marginBottom: 16,
@@ -309,22 +312,22 @@ export default function Materials() {
             </div>
           )}
 
-          {/* Materyal Görünümü */}
+          {/* Material Viewer */}
           {currentMaterial && !generating && (
             <div className="card">
-              {/* Materyal Başlık */}
+              {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
                 <div>
                   <h3 style={{ fontSize: '1.2rem', marginBottom: 4 }}>{currentMaterial.title}</h3>
                   <div style={{ display: 'flex', gap: 12, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     <span>
                       <Image size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                      {scenes.filter(s => s.image_path).length}/{scenes.length} görsel
+                      {scenes.filter(s => s.image_path).length}/{scenes.length} images
                     </span>
                     {genMs && (
                       <span>
                         <Clock size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                        {(genMs / 1000).toFixed(1)}sn
+                        {(genMs / 1000).toFixed(1)}s
                       </span>
                     )}
                   </div>
@@ -337,12 +340,12 @@ export default function Materials() {
                     style={{ textDecoration: 'none' }}
                   >
                     <Download size={16} />
-                    PDF İndir
+                    Download PDF
                   </a>
                 )}
               </div>
 
-              {/* Sahne Navigasyonu */}
+              {/* Scene Navigation */}
               {scenes.length > 0 && (
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -355,7 +358,7 @@ export default function Materials() {
                       <ChevronLeft size={16} />
                     </button>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      Sahne {activeScene + 1} / {scenes.length}
+                      Scene {activeScene + 1} / {scenes.length}
                     </div>
                     <button
                       onClick={() => setActiveScene(s => Math.min(scenes.length - 1, s + 1))}
@@ -367,7 +370,7 @@ export default function Materials() {
                     </button>
                   </div>
 
-                  {/* Aktif Sahne */}
+                  {/* Active Scene */}
                   {scenes[activeScene] && (
                     <div style={{
                       display: 'grid',
@@ -375,7 +378,6 @@ export default function Materials() {
                       gap: 20,
                       minHeight: 280,
                     }}>
-                      {/* Görsel */}
                       {scenes[activeScene].image_path && (
                         <div style={{
                           borderRadius: 12, overflow: 'hidden',
@@ -384,16 +386,13 @@ export default function Materials() {
                         }}>
                           <img
                             src={toStaticUrl(scenes[activeScene].image_path) ?? ''}
-                            alt={`Sahne ${activeScene + 1}`}
+                            alt={`Scene ${activeScene + 1}`}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                            onError={e => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
+                            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
                         </div>
                       )}
 
-                      {/* Metin */}
                       <div style={{
                         display: 'flex', flexDirection: 'column', justifyContent: 'center',
                         padding: 20,
@@ -404,7 +403,7 @@ export default function Materials() {
                           fontSize: '0.7rem', color: 'var(--color-primary-light)',
                           fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1,
                         }}>
-                          Sahne {scenes[activeScene].order}
+                          Scene {scenes[activeScene].order}
                         </div>
                         <p style={{
                           fontSize: '1rem', lineHeight: 1.8,
@@ -416,7 +415,7 @@ export default function Materials() {
                     </div>
                   )}
 
-                  {/* Sahne Nokta Navigasyonu */}
+                  {/* Dot Navigation */}
                   <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 16 }}>
                     {scenes.map((_, i) => (
                       <button
@@ -436,15 +435,15 @@ export default function Materials() {
             </div>
           )}
 
-          {/* Boş Durum */}
+          {/* Empty State */}
           {!currentMaterial && !generating && !error && (
             <div className="card" style={{ textAlign: 'center', padding: '60px 40px' }}>
               <Sparkles size={48} color="var(--text-muted)" style={{ marginBottom: 16, opacity: 0.4 }} />
               <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400 }}>
-                Soldaki formu doldurun ve materyal üretin
+                Fill in the form and generate your first material
               </h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                HuggingFace FLUX.1-schnell ile kişiselleştirilmiş görseller üretilir
+                Personalized illustrations generated with HuggingFace FLUX.1-schnell
               </p>
             </div>
           )}

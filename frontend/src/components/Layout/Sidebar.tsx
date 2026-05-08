@@ -14,12 +14,12 @@ import {
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/query', icon: MessageSquareText, label: 'Soru Sor' },
-  { to: '/sources', icon: FileText, label: 'Kaynaklar' },
-  { to: '/students', icon: Users, label: 'Öğrenciler' },
-  { to: '/observations', icon: Eye, label: 'Gözlem Kayıt' },
-  { to: '/materials', icon: Sparkles, label: 'Materyal Üretici' },
-  { to: '/iep', icon: ClipboardList, label: 'BEP Üretici' },
+  { to: '/query', icon: MessageSquareText, label: 'Ask Question' },
+  { to: '/sources', icon: FileText, label: 'Sources' },
+  { to: '/students', icon: Users, label: 'Students' },
+  { to: '/observations', icon: Eye, label: 'Observations' },
+  { to: '/materials', icon: Sparkles, label: 'Materials' },
+  { to: '/iep', icon: ClipboardList, label: 'IEP Generator' },
 ];
 
 export default function Sidebar() {
@@ -29,7 +29,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <h1><GraduationCap size={20} style={{ display: 'inline', marginRight: 8, verticalAlign: 'middle' }} />EduRAG</h1>
-        <span>Özel Eğitim Asistanı</span>
+        <span>Special Education Assistant</span>
       </div>
 
       <nav className="sidebar-nav">
@@ -49,7 +49,7 @@ export default function Sidebar() {
       <div className="sidebar-footer">
         <button className="sidebar-logout" onClick={logout}>
           <LogOut size={16} />
-          Çıkış Yap
+          Sign Out
         </button>
       </div>
     </aside>

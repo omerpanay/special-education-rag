@@ -15,9 +15,24 @@ interface Student {
   disability_type: string;
 }
 
-const CATEGORY_OPTIONS = ['Davranış', 'Akademik', 'Kriz', 'Sosyal', 'İletişim'];
+const CATEGORY_OPTIONS = ['Behavior', 'Academic', 'Crisis', 'Social', 'Communication'];
+
+// Map English display names back to Turkish API values
+const CATEGORY_API_MAP: Record<string, string> = {
+  'Behavior': 'Davranış',
+  'Academic': 'Akademik',
+  'Crisis': 'Kriz',
+  'Social': 'Sosyal',
+  'Communication': 'İletişim',
+};
 
 const CATEGORY_COLORS: Record<string, string> = {
+  'Behavior': '#f59e0b',
+  'Academic': '#3b82f6',
+  'Crisis': '#ef4444',
+  'Social': '#8b5cf6',
+  'Communication': '#10b981',
+  // Turkish values (from API history)
   'Davranış': '#f59e0b',
   'Akademik': '#3b82f6',
   'Kriz': '#ef4444',
@@ -25,11 +40,19 @@ const CATEGORY_COLORS: Record<string, string> = {
   'İletişim': '#10b981',
 };
 
+const CATEGORY_DISPLAY: Record<string, string> = {
+  'Davranış': 'Behavior',
+  'Akademik': 'Academic',
+  'Kriz': 'Crisis',
+  'Sosyal': 'Social',
+  'İletişim': 'Communication',
+};
+
 export default function Observations() {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<string>('');
   const [summary, setSummary] = useState('');
-  const [category, setCategory] = useState('Davranış');
+  const [category, setCategory] = useState('Behavior');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ObservationOut | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +79,7 @@ export default function Observations() {
     try {
       const data = await getObservations(studentId);
       setHistory(data.observations || []);
-    } catch { /* sessiz */ }
+    } catch { /* silent */ }
     setHistoryLoading(false);
   };
 
@@ -76,7 +99,7 @@ export default function Observations() {
     try {
       const obs = await createObservation({
         student_id: selectedStudent,
-        category,
+        category: CATEGORY_API_MAP[category] || category,
         summary: summary.trim(),
         antecedent: '',
         behavior: '',
@@ -86,7 +109,7 @@ export default function Observations() {
       setSummary('');
       loadHistory(selectedStudent);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
     setLoading(false);
   };
@@ -99,25 +122,25 @@ export default function Observations() {
       <div className="page-header">
         <h2>
           <Eye size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />
-          Gözlem Kayıt
+          Observation Log
         </h2>
-        <p>Öğrenci davranışlarını kaydedin — AI otomatik ABC analizi yapar</p>
+        <p>Record student behaviors — AI automatically performs ABC analysis</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        {/* Form Kartı */}
+        {/* Form Card */}
         <div>
           <div className="card">
             <h3 style={{ fontSize: '1rem', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
               <PlusCircle size={18} color="var(--color-primary-light)" />
-              Yeni Gözlem
+              New Observation
             </h3>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Öğrenci Seçici */}
+              {/* Student Selector */}
               <div>
                 <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-                  Öğrenci
+                  Student
                 </label>
                 <select
                   value={selectedStudent}
@@ -135,10 +158,10 @@ export default function Observations() {
                 </select>
               </div>
 
-              {/* Kategori */}
+              {/* Category */}
               <div>
                 <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-                  Gözlem Kategorisi
+                  Observation Category
                 </label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {CATEGORY_OPTIONS.map(cat => (
@@ -162,16 +185,16 @@ export default function Observations() {
                 </div>
               </div>
 
-              {/* Gözlem Metni */}
+              {/* Observation Text */}
               <div>
                 <label style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 6, display: 'block' }}>
-                  Gözlem Açıklaması
+                  Observation Description
                 </label>
                 <textarea
                   value={summary}
                   onChange={e => setSummary(e.target.value)}
                   rows={5}
-                  placeholder="Öğrencinin davranışını serbest şekilde anlatın. Örn: 'Matematik dersi sırasında kalem kutusunu yere fırlattı, sınıfı terk etmek istedi. Sakinleştirici nesne verilince 5 dakikada sakinleşti.'"
+                  placeholder="Describe the student's behavior freely. E.g.: 'During math class, the student threw the pencil case on the floor and wanted to leave the desk. After receiving a calming object, settled down within 5 minutes.'"
                   style={{
                     width: '100%', padding: '12px 14px',
                     background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
@@ -181,7 +204,7 @@ export default function Observations() {
                   }}
                 />
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                  ABC alanlarını boş bırakın — AI otomatik dolduracak
+                  Leave A/B/C fields empty — AI will automatically fill them in
                 </div>
               </div>
 
@@ -194,19 +217,19 @@ export default function Observations() {
                 {loading ? (
                   <>
                     <div className="spinner" style={{ width: 16, height: 16, marginRight: 8 }} />
-                    ABC analizi yapılıyor...
+                    Running ABC analysis...
                   </>
                 ) : (
                   <>
                     <Eye size={16} />
-                    Gözlemi Kaydet
+                    Save Observation
                   </>
                 )}
               </button>
             </form>
           </div>
 
-          {/* Hata Mesajı */}
+          {/* Error */}
           {error && (
             <div style={{
               marginTop: 16, padding: '12px 16px', borderRadius: 'var(--radius-sm)',
@@ -218,7 +241,7 @@ export default function Observations() {
             </div>
           )}
 
-          {/* ABC Sonuç Kartı */}
+          {/* ABC Result Card */}
           {result && (
             <div className="card" style={{
               marginTop: 16,
@@ -226,14 +249,14 @@ export default function Observations() {
               animation: 'fadeIn 0.3s ease',
             }}>
               <h4 style={{ fontSize: '0.9rem', marginBottom: 16, color: 'var(--color-accent)' }}>
-                ✓ Gözlem Kaydedildi — ABC Analizi
+                ✓ Observation Saved — ABC Analysis
               </h4>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
-                  { label: 'A — Tetikleyici (Antecedent)', value: result.antecedent, color: '#f59e0b' },
-                  { label: 'B — Davranış (Behavior)', value: result.behavior, color: '#3b82f6' },
-                  { label: 'C — Sonuç (Consequence)', value: result.consequence, color: '#10b981' },
+                  { label: 'A — Antecedent', value: result.antecedent, color: '#f59e0b' },
+                  { label: 'B — Behavior', value: result.behavior, color: '#3b82f6' },
+                  { label: 'C — Consequence', value: result.consequence, color: '#10b981' },
                 ].map(item => (
                   <div key={item.label} style={{
                     padding: '10px 14px', borderRadius: 8,
@@ -244,7 +267,7 @@ export default function Observations() {
                       {item.label}
                     </div>
                     <div style={{ fontSize: '0.88rem' }}>
-                      {item.value || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Belirtilmedi</span>}
+                      {item.value || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Not specified</span>}
                     </div>
                   </div>
                 ))}
@@ -253,26 +276,26 @@ export default function Observations() {
               {result.structuring_latency_ms && (
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                   <Clock size={12} />
-                  AI analiz süresi: {(result.structuring_latency_ms / 1000).toFixed(1)}sn
+                  AI analysis time: {(result.structuring_latency_ms / 1000).toFixed(1)}s
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* Gözlem Geçmişi */}
+        {/* Observation History */}
         <div className="card">
           <h3 style={{ fontSize: '1rem', marginBottom: 16 }}>
             {selectedStudentName
-              ? `${selectedStudentName} — Gözlem Geçmişi`
-              : 'Gözlem Geçmişi'}
+              ? `${selectedStudentName} — Observation History`
+              : 'Observation History'}
           </h3>
 
           {historyLoading ? (
             <div className="loading-container"><div className="spinner" /></div>
           ) : history.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '32px 0' }}>
-              Henüz gözlem kaydı yok.
+              No observations recorded yet.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -284,7 +307,6 @@ export default function Observations() {
                     border: '1px solid var(--border-subtle)',
                   }}
                 >
-                  {/* Satır başlığı */}
                   <div
                     onClick={() => setExpandedId(expandedId === obs.id ? null : obs.id)}
                     style={{
@@ -301,7 +323,7 @@ export default function Observations() {
                         color: CATEGORY_COLORS[obs.category] || '#888',
                         fontWeight: 600,
                       }}>
-                        {obs.category}
+                        {CATEGORY_DISPLAY[obs.category] || obs.category}
                       </span>
                       <span style={{ fontSize: '0.85rem' }}>
                         {obs.summary.length > 55 ? obs.summary.slice(0, 55) + '…' : obs.summary}
@@ -309,7 +331,7 @@ export default function Observations() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                       <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                        {new Date(obs.created_at).toLocaleDateString('tr-TR')}
+                        {new Date(obs.created_at).toLocaleDateString('en-US')}
                       </span>
                       {expandedId === obs.id
                         ? <ChevronUp size={14} color="var(--text-muted)" />
@@ -318,13 +340,12 @@ export default function Observations() {
                     </div>
                   </div>
 
-                  {/* Genişletilmiş ABC detayı */}
                   {expandedId === obs.id && (
                     <div style={{ padding: '12px 14px', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {[
-                        { label: 'A — Tetikleyici', value: obs.antecedent, color: '#f59e0b' },
-                        { label: 'B — Davranış', value: obs.behavior, color: '#3b82f6' },
-                        { label: 'C — Sonuç', value: obs.consequence, color: '#10b981' },
+                        { label: 'A — Antecedent', value: obs.antecedent, color: '#f59e0b' },
+                        { label: 'B — Behavior', value: obs.behavior, color: '#3b82f6' },
+                        { label: 'C — Consequence', value: obs.consequence, color: '#10b981' },
                       ].map(item => (
                         item.value && (
                           <div key={item.label} style={{

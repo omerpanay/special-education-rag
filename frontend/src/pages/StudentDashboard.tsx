@@ -33,10 +33,10 @@ interface ConvSummary {
 }
 
 const DISABILITY_LABELS: Record<string, string> = {
-  disleksi: 'Disleksi', otizm: 'Otizm Spektrum Bozukluğu',
-  zihin_yetersizligi: 'Zihinsel Yetersizlik',
-  isitme: 'İşitme Yetersizliği', bedensel: 'Bedensel Yetersizlik',
-  dehb: 'DEHB',
+  disleksi: 'Dyslexia', otizm: 'Autism Spectrum Disorder',
+  zihin_yetersizligi: 'Intellectual Disability',
+  isitme: 'Hearing Impairment', bedensel: 'Physical Disability',
+  dehb: 'ADHD',
 };
 
 export default function StudentDashboard() {
@@ -75,15 +75,15 @@ export default function StudentDashboard() {
         const data = await convRes.json();
         setConversations(data.items || []);
       }
-      // Gözlem ve materyal verileri
+      // Fetch observation and material data
       try {
         const obsData = await getObservations(id);
         setObservations(obsData.observations || []);
-      } catch { /* sessiz */ }
+      } catch { /* silent */ }
       try {
         const matData = await getStudentMaterials(id);
         setMaterials(Array.isArray(matData) ? matData : []);
-      } catch { /* sessiz */ }
+      } catch { /* silent */ }
     } catch { /* silent */ }
     setLoading(false);
   };
@@ -118,9 +118,9 @@ export default function StudentDashboard() {
   if (!student) {
     return (
       <div className="card empty-state">
-        <h3>Öğrenci bulunamadı</h3>
+        <h3>Student not found</h3>
         <Link to="/students" className="btn btn-primary" style={{ marginTop: 12 }}>
-          <ArrowLeft size={16} /> Öğrencilere Dön
+          <ArrowLeft size={16} /> Back to Students
         </Link>
       </div>
     );
@@ -135,13 +135,13 @@ export default function StudentDashboard() {
             fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'none',
             display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8,
           }}>
-            <ArrowLeft size={14} /> Öğrencilere Dön
+            <ArrowLeft size={14} /> Back to Students
           </Link>
           <h2>
             <User size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />
             {student.name}
           </h2>
-          <p>{DISABILITY_LABELS[student.disability_type] || student.disability_type} · {student.grade_level}. Sınıf</p>
+          <p>{DISABILITY_LABELS[student.disability_type] || student.disability_type} · Grade {student.grade_level}</p>
         </div>
       </div>
 
@@ -150,22 +150,22 @@ export default function StudentDashboard() {
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
           <ClipboardList size={28} color="var(--color-primary-light)" />
           <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{ieps.length}</div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>BEP Taslağı</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>IEP Drafts</div>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
           <MessageSquare size={28} color="var(--color-accent)" />
           <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{conversations.length}</div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Konuşma</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Conversations</div>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
           <Eye size={28} color="#f59e0b" />
           <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{observations.length}</div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Gözlem</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Observations</div>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
           <Sparkles size={28} color="#8b5cf6" />
           <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{materials.length}</div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Materyal</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Materials</div>
         </div>
       </div>
 
@@ -173,17 +173,17 @@ export default function StudentDashboard() {
         {/* Profil Kartı */}
         <div className="card">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <User size={18} /> Öğrenci Profili
+            <User size={18} /> Student Profile
           </h3>
           <table className="source-table">
             <tbody>
-              <tr><td style={{ fontWeight: 600, width: '40%' }}>Ad-Soyad</td><td>{student.name}</td></tr>
-              <tr><td style={{ fontWeight: 600 }}>Eğitsel Tanı</td><td>{DISABILITY_LABELS[student.disability_type]}</td></tr>
-              <tr><td style={{ fontWeight: 600 }}>Sınıf</td><td>{student.grade_level}. Sınıf</td></tr>
-              <tr><td style={{ fontWeight: 600 }}>Durum</td><td>{student.is_active ? '✅ Aktif' : '⏸ Pasif'}</td></tr>
-              <tr><td style={{ fontWeight: 600 }}>Kayıt Tarihi</td><td>{new Date(student.created_at).toLocaleDateString('tr-TR')}</td></tr>
+              <tr><td style={{ fontWeight: 600, width: '40%' }}>Full Name</td><td>{student.name}</td></tr>
+              <tr><td style={{ fontWeight: 600 }}>Educational Diagnosis</td><td>{DISABILITY_LABELS[student.disability_type]}</td></tr>
+              <tr><td style={{ fontWeight: 600 }}>Grade</td><td>Grade {student.grade_level}</td></tr>
+              <tr><td style={{ fontWeight: 600 }}>Status</td><td>{student.is_active ? '✅ Active' : '⏸ Inactive'}</td></tr>
+              <tr><td style={{ fontWeight: 600 }}>Enrolled</td><td>{new Date(student.created_at).toLocaleDateString('en-US')}</td></tr>
               {student.competency_notes && (
-                <tr><td style={{ fontWeight: 600 }}>Yetkinlik Notları</td><td>{student.competency_notes}</td></tr>
+                <tr><td style={{ fontWeight: 600 }}>Competency Notes</td><td>{student.competency_notes}</td></tr>
               )}
             </tbody>
           </table>
@@ -192,14 +192,14 @@ export default function StudentDashboard() {
         {/* KVKK Rıza Kartı */}
         <div className="card">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <Shield size={18} /> KVKK Rıza Durumu
+            <Shield size={18} /> Data Consent (GDPR)
           </h3>
           {consent ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
-                { key: 'data_processing', label: 'Kişisel Veri İşleme', desc: 'Öğrenci verilerinin platform üzerinde işlenmesi' },
-                { key: 'ai_analysis', label: 'AI Analizi', desc: 'Yapay zeka ile performans analizi' },
-                { key: 'game_participation', label: 'Oyun Katılımı', desc: 'Eğitsel oyun oturumlarına katılım' },
+                { key: 'data_processing', label: 'Personal Data Processing', desc: 'Processing student data on the platform' },
+                { key: 'ai_analysis', label: 'AI Analysis', desc: 'Performance analysis using artificial intelligence' },
+                { key: 'game_participation', label: 'Game Participation', desc: 'Participation in educational game sessions' },
               ].map(item => (
                 <div key={item.key} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -240,24 +240,24 @@ export default function StudentDashboard() {
               ))}
               {consent.granted_at && (
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>
-                  Son güncelleme: {new Date(consent.granted_at).toLocaleDateString('tr-TR')}
+                  Last updated: {new Date(consent.granted_at).toLocaleDateString('en-US')}
                 </div>
               )}
             </div>
           ) : (
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Henüz rıza kaydı yok.</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No consent record yet.</div>
           )}
         </div>
 
         {/* BEP Taslakları */}
         <div className="card">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <FileText size={18} /> BEP Taslakları
+            <FileText size={18} /> IEP Drafts
           </h3>
           {ieps.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Henüz BEP taslağı yok.
-              <Link to="/iep" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Üret →</Link>
+              No IEP drafts yet.
+              <Link to="/iep" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Generate →</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -268,9 +268,9 @@ export default function StudentDashboard() {
                   background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
                 }}>
                   <div>
-                    <span style={{ fontWeight: 600 }}>BEP v{iep.version}</span>
+                    <span style={{ fontWeight: 600 }}>IEP v{iep.version}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: 8 }}>
-                      {new Date(iep.created_at).toLocaleDateString('tr-TR')}
+                      {new Date(iep.created_at).toLocaleDateString('en-US')}
                     </span>
                   </div>
                   <span style={{
@@ -278,7 +278,7 @@ export default function StudentDashboard() {
                     background: iep.status === 'finalized' ? 'var(--color-accent)' :
                       iep.status === 'reviewed' ? 'var(--color-primary-light)' : 'var(--color-warning)',
                   }}>
-                    {iep.status === 'draft' ? 'Taslak' : iep.status === 'reviewed' ? 'İncelendi' : 'Kesinleşti'}
+                    {iep.status === 'draft' ? 'Draft' : iep.status === 'reviewed' ? 'Reviewed' : 'Finalized'}
                   </span>
                 </div>
               ))}
@@ -289,12 +289,12 @@ export default function StudentDashboard() {
         {/* Son Gözlemler */}
         <div className="card">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <Eye size={18} /> Son Gözlemler
+            <Eye size={18} /> Recent Observations
           </h3>
           {observations.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Henüz gözlem kaydı yok.
-              <Link to="/observations" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Kaydet →</Link>
+              No observations recorded yet.
+              <Link to="/observations" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Record →</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -308,7 +308,7 @@ export default function StudentDashboard() {
                       {obs.category}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                      {new Date(obs.created_at).toLocaleDateString('tr-TR')}
+                      {new Date(obs.created_at).toLocaleDateString('en-US')}
                     </span>
                   </div>
                   <div style={{ fontSize: '0.82rem' }}>{obs.summary.slice(0, 80)}{obs.summary.length > 80 ? '…' : ''}</div>
@@ -318,15 +318,15 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* Son Materyaller */}
+        {/* Recent Materials */}
         <div className="card">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <Sparkles size={18} /> Son Materyaller
+            <Sparkles size={18} /> Recent Materials
           </h3>
           {materials.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Henüz materyal yok.
-              <Link to="/materials" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Üret →</Link>
+              No materials generated yet.
+              <Link to="/materials" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Generate →</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -339,14 +339,14 @@ export default function StudentDashboard() {
                   <div>
                     <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{mat.title}</div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
-                      {mat.content?.scenes?.length ?? 0} sahne · {new Date(mat.created_at).toLocaleDateString('tr-TR')}
+                      {mat.content?.scenes?.length ?? 0} scenes · {new Date(mat.created_at).toLocaleDateString('en-US')}
                     </div>
                   </div>
                   <span style={{
                     fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#fff',
                     background: mat.status === 'completed' ? 'var(--color-accent)' : 'var(--color-warning)',
                   }}>
-                    {mat.status === 'completed' ? 'Tamamlandı' : mat.status}
+                    {mat.status === 'completed' ? 'Completed' : mat.status}
                   </span>
                 </div>
               ))}

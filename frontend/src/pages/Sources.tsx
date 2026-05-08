@@ -4,10 +4,10 @@ import type { AcademicSource, SourceType } from '../types';
 import { Upload, FileText, CheckCircle, RefreshCw } from 'lucide-react';
 
 const SOURCE_TYPES: { value: SourceType; label: string }[] = [
-  { value: 'MEB', label: 'MEB Dokümanı' },
-  { value: 'YOK_TEZ', label: 'YÖK Tez' },
-  { value: 'MAKALE', label: 'Akademik Makale' },
-  { value: 'SAGLIK_BAK', label: 'Sağlık Bakanlığı' },
+  { value: 'MEB', label: 'Ministry of Education Document' },
+  { value: 'YOK_TEZ', label: 'Academic Thesis' },
+  { value: 'MAKALE', label: 'Research Article' },
+  { value: 'SAGLIK_BAK', label: 'Ministry of Health' },
 ];
 
 export default function Sources() {
@@ -40,13 +40,13 @@ export default function Sources() {
     setUploadMsg('');
     try {
       await uploadSource(file, title, sourceType);
-      setUploadMsg('✅ Dosya başarıyla yüklendi ve indekslendi!');
+      setUploadMsg('✅ File uploaded and indexed successfully!');
       setFile(null);
       setTitle('');
       if (fileInputRef.current) fileInputRef.current.value = '';
       fetchSources();
     } catch (err) {
-      setUploadMsg(`❌ ${err instanceof Error ? err.message : 'Yükleme hatası'}`);
+      setUploadMsg(`❌ ${err instanceof Error ? err.message : 'Upload failed'}`);
     }
     setUploading(false);
   };
@@ -69,8 +69,8 @@ export default function Sources() {
   return (
     <div>
       <div className="page-header">
-        <h2><FileText size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />Kaynak Yönetimi</h2>
-        <p>Akademik PDF dosyalarını yükleyin ve yönetin</p>
+        <h2><FileText size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />Source Management</h2>
+        <p>Upload and manage academic PDF documents for the RAG pipeline</p>
       </div>
 
       {/* Upload */}
@@ -82,7 +82,7 @@ export default function Sources() {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}>
             <Upload size={36} className="upload-icon" />
-            <p>{file ? `📄 ${file.name}` : 'PDF dosyasını sürükleyin veya tıklayarak seçin'}</p>
+            <p>{file ? `📄 ${file.name}` : 'Drag & drop a PDF file here, or click to select'}</p>
             <input ref={fileInputRef} type="file" accept=".pdf" hidden
               onChange={e => {
                 const f = e.target.files?.[0] || null;
@@ -93,11 +93,11 @@ export default function Sources() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: 16, marginTop: 16 }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label htmlFor="srcTitle">Kaynak Başlığı</label>
-              <input id="srcTitle" className="form-input" placeholder="Kaynak başlığı" value={title} onChange={e => setTitle(e.target.value)} required />
+              <label htmlFor="srcTitle">Source Title</label>
+              <input id="srcTitle" className="form-input" placeholder="Source title" value={title} onChange={e => setTitle(e.target.value)} required />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label htmlFor="srcType">Kaynak Türü</label>
+              <label htmlFor="srcType">Source Type</label>
               <select id="srcType" className="form-select" value={sourceType} onChange={e => setSourceType(e.target.value as SourceType)}>
                 {SOURCE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
@@ -107,7 +107,7 @@ export default function Sources() {
           <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
             <button type="submit" className="btn btn-primary" disabled={!file || !title || uploading}>
               <Upload size={16} />
-              {uploading ? 'Yükleniyor...' : 'Yükle ve İndeksle'}
+              {uploading ? 'Uploading...' : 'Upload & Index'}
             </button>
             {uploadMsg && <span style={{ fontSize: '0.85rem' }}>{uploadMsg}</span>}
           </div>
@@ -117,8 +117,8 @@ export default function Sources() {
       {/* Source List */}
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ fontSize: '1rem' }}>Yüklenmiş Kaynaklar ({sources.length})</h3>
-          <button className="btn-icon" onClick={fetchSources} title="Yenile"><RefreshCw size={16} /></button>
+          <h3 style={{ fontSize: '1rem' }}>Indexed Sources ({sources.length})</h3>
+          <button className="btn-icon" onClick={fetchSources} title="Refresh"><RefreshCw size={16} /></button>
         </div>
 
         {loading ? (
@@ -126,17 +126,17 @@ export default function Sources() {
         ) : sources.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon"><FileText size={48} /></div>
-            <h3>Henüz kaynak yok</h3>
-            <p>Yukarıdan PDF yükleyerek başlayın</p>
+            <h3>No sources yet</h3>
+            <p>Upload a PDF above to get started</p>
           </div>
         ) : (
           <table className="source-table">
             <thead>
               <tr>
-                <th>Başlık</th>
-                <th>Tür</th>
-                <th>Sayfa</th>
-                <th>Durum</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Pages</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -147,8 +147,8 @@ export default function Sources() {
                   <td>{s.page_count ?? '-'}</td>
                   <td>
                     {s.is_indexed
-                      ? <span className="badge badge-indexed"><CheckCircle size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />İndekslendi</span>
-                      : <span className="badge badge-processing">İşleniyor</span>}
+                      ? <span className="badge badge-indexed"><CheckCircle size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />Indexed</span>
+                      : <span className="badge badge-processing">Processing</span>}
                   </td>
                 </tr>
               ))}

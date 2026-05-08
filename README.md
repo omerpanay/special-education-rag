@@ -1,29 +1,29 @@
-# EduRAG — Özel Eğitim AI Asistanı
+# EduRAG — AI Assistant for Special Education
 
-> **Geliştirme Aşamasında** | Kapstone Projesi | 2025-2026
+> **Active Development** | Capstone Project | 2025–2026
 
-EduRAG, özel gereksinimli öğrencilerle çalışan öğretmenlere yönelik **kanıta dayalı, agentic bir AI asistan platformudur**. Öğretmenler akademik PDF kaynaklarına soru sorabilir, öğrenci davranışlarını AI ile analiz edebilir ve kişiselleştirilmiş sosyal öykü materyalleri üretebilir.
+EduRAG is an **evidence-based, agentic AI assistant platform** for teachers working with students who have special educational needs. Teachers can query academic PDF sources, analyze student behavior automatically with AI, and generate personalized social story materials.
 
 ---
 
-## 🎯 Temel Özellikler
+## 🎯 Core Features
 
-| Özellik | Açıklama | Teknoloji |
+| Feature | Description | Technology |
 |---|---|---|
-| **Hibrit RAG** | Akademik kaynaklara dayalı soru-cevap, kaynak ataması ile | LangChain + pgvector + FTS |
-| **Voice-to-Action** | Sesli gözlem → otomatik ABC davranış analizi | Groq Whisper + LLM |
-| **Materyal Üretimi** | Öğrencinin ilgi alanına göre kişisel sosyal öykü + görsel | LangGraph + HuggingFace FLUX.1 |
-| **Agentic Pipeline** | Çok-ajanlı materyal üretim grafiği | LangGraph (Writer→Prompt→Image→PDF) |
-| **Zero-Hallucination** | Cosine similarity eşiği, alan dışı soru reddi | pgvector + guardrail |
+| **Hybrid RAG** | Q&A grounded in academic sources, with citation per answer | LangChain + pgvector + FTS |
+| **ABC Behavior Analysis** | Free-text observation → automatic A/B/C structuring via LLM | Groq LLM (Llama 3.1) |
+| **Material Generation** | Personalized social story + illustrations based on student interests | LangGraph + HuggingFace FLUX.1 |
+| **Agentic Pipeline** | Multi-agent material generation graph | LangGraph (Writer → Prompt → Image → PDF) |
+| **Zero-Hallucination** | Cosine similarity threshold, out-of-domain query rejection | pgvector + domain guardrail |
 
 ---
 
-## 🏗️ Mimari
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     React Frontend                        │
-│   Dashboard │ RAG Chat │ Gözlem │ Materyal │ BEP Üretici │
+│  Dashboard │ RAG Chat │ Observations │ Materials │ IEP   │
 └───────────────────────┬─────────────────────────────────┘
                         │ REST API (JWT Auth)
 ┌───────────────────────▼─────────────────────────────────┐
@@ -34,52 +34,52 @@ EduRAG, özel gereksinimli öğrencilerle çalışan öğretmenlere yönelik **k
 ┌──────▼──────┐                    ┌──────────▼──────────┐
 │  PostgreSQL  │                    │    External APIs     │
 │  + pgvector  │                    │  Groq (LLM+Whisper) │
-│  14 tablo    │                    │  HuggingFace FLUX.1  │
+│  14 tables   │                    │  HuggingFace FLUX.1  │
 └─────────────┘                    └─────────────────────┘
 ```
 
 ---
 
-## 🛠️ Teknoloji Yığını
+## 🛠️ Tech Stack
 
 **Backend**
 - Python 3.13, FastAPI 0.115, SQLAlchemy 2.0 (async)
 - LangChain 0.3, LangGraph (agentic pipeline)
-- PostgreSQL 16 + pgvector 0.8 (hibrit arama)
+- PostgreSQL 16 + pgvector 0.8 (hybrid search)
 - Groq API (Llama 3.1, Whisper Large v3)
-- HuggingFace Inference Router (FLUX.1-schnell görsel üretimi)
-- Pydantic v2, structlog, JWT auth
+- HuggingFace Inference Router (FLUX.1-schnell image generation)
+- Pydantic v2, structlog, JWT authentication
 
 **Frontend**
 - React 19, TypeScript, Vite
 - React Router v7
 
-**Geliştirme Araçları**
+**Tooling**
 - Docker (PostgreSQL container)
-- Spec-Kit (AI destekli özellik planlama ve görev yönetimi)
-- Alembic (veritabanı migration)
+- Spec-Kit (AI-assisted feature planning and task management)
+- Alembic (database migrations)
 
 ---
 
-## 📁 Proje Yapısı
+## 📁 Project Structure
 
 ```
 Capstone-PROJECT/
 ├── backend/
 │   ├── app/
-│   │   ├── api/v1/          # REST endpoint'leri
+│   │   ├── api/v1/          # REST endpoints
 │   │   ├── core/            # Config, Security, Logging
-│   │   ├── models/          # SQLAlchemy ORM modelleri
-│   │   ├── schemas/         # Pydantic şemaları
-│   │   ├── services/        # İş mantığı katmanı
+│   │   ├── models/          # SQLAlchemy ORM models
+│   │   ├── schemas/         # Pydantic schemas
+│   │   ├── services/        # Business logic layer
 │   │   └── rag/             # RAG pipeline (LangChain + LangGraph)
-│   ├── scripts/             # Entegrasyon testleri, araçlar
-│   └── Sources/             # İndekslenmiş akademik PDF'ler
+│   ├── scripts/             # Integration tests, utilities
+│   └── Sources/             # Indexed academic PDFs
 ├── frontend/
 │   └── src/
 │       ├── pages/           # Dashboard, Query, Observations, Materials...
 │       └── services/        # API client (JWT interceptor)
-└── specs/                   # Spec-Kit ile üretilen tasarım dokümanları
+└── specs/                   # Spec-Kit design documents
     └── 001-edurag-platform/
         ├── spec.md
         ├── plan.md
@@ -88,9 +88,9 @@ Capstone-PROJECT/
 
 ---
 
-## 🚀 Yerel Kurulum
+## 🚀 Local Setup
 
-### Gereksinimler
+### Prerequisites
 - Python 3.13+
 - Node.js 20+
 - Docker Desktop
@@ -98,23 +98,24 @@ Capstone-PROJECT/
 ### Backend
 
 ```bash
-# PostgreSQL container başlat
+# Start PostgreSQL + pgvector container
 docker run -d --name edurag-db \
-  -e POSTGRES_PASSWORD=sifrem123 \
+  -e POSTGRES_PASSWORD=yourpassword \
   -p 5433:5432 \
   ankane/pgvector
 
-# Bağımlılıkları yükle
+# Install dependencies
 cd backend
 pip install -r requirements.txt
 
-# .env dosyasını oluştur (.env.example'dan)
+# Configure environment
 cp .env.example .env
+# Edit .env with your API keys
 
-# Migration
+# Run database migrations
 alembic upgrade head
 
-# Sunucuyu başlat
+# Start server
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -124,73 +125,73 @@ uvicorn app.main:app --reload --port 8000
 cd frontend
 npm install
 npm run dev
-# http://localhost:5173
+# Open http://localhost:5173
 ```
 
-### API Dokümantasyonu
-`http://localhost:8000/docs` (Swagger UI)
+### API Documentation
+Swagger UI: `http://localhost:8000/docs`
 
 ---
 
-## 📊 Veritabanı Şeması (14 Tablo)
+## 📊 Database Schema (14 Tables)
 
 `teachers` · `students` · `consents` · `academic_sources` · `source_chunks` (pgvector) · `rag_responses` · `response_chunks` · `observations` · `materials` · `iep_drafts` · `feedbacks` · `conversations` · `conversation_messages` · `alembic_version`
 
 ---
 
-## 🔬 Entegrasyon Testi
+## 🔬 Integration Test
 
 ```bash
 cd backend
 python scripts/integration_test.py
 
-# Beklenen çıktı:
+# Expected output:
 # PASS  GET /health
 # PASS  POST /auth/login
 # PASS  GET /students/
-# PASS  POST /query (alan ici)     ← RAG
-# PASS  POST /query (alan disi)    ← Guardrail
-# PASS  POST /observations/        ← ABC Analizi
-# PASS  POST /materials/generate   ← FLUX.1 görseli
-# PASS  Gorsel uretimi  2/2
-# PASS  PDF olusturuldu
-# Toplam: 9/9
+# PASS  POST /query (in-domain)      ← RAG with citations
+# PASS  POST /query (out-of-domain)  ← Guardrail active
+# PASS  POST /observations/          ← ABC auto-structuring
+# PASS  POST /materials/generate     ← FLUX.1 image generation
+# PASS  Image generation  2/2
+# PASS  PDF created
+# Total: 9/9
 ```
 
 ---
 
-## 📌 Geliştirme Süreci
+## 📌 Development Process
 
-Bu proje **Spec-Kit** metodolojisi ile yönetildi:
-- `specs/001-edurag-platform/spec.md` → Özellik tanımı
-- `specs/001-edurag-platform/plan.md` → Teknik implementasyon planı
-- `specs/001-edurag-platform/tasks.md` → Görev listesi
+This project was managed using the **Spec-Kit** methodology:
+- `specs/001-edurag-platform/spec.md` → Feature specification
+- `specs/001-edurag-platform/plan.md` → Technical implementation plan
+- `specs/001-edurag-platform/tasks.md` → Task breakdown
 
-Geliştirme aşamalarına git branch geçmişinden ulaşılabilir.
+Development phases are traceable through Git branch history.
 
 ---
 
-## ⚠️ Geliştirme Durumu
+## ⚠️ Development Status
 
-> Bu proje aktif geliştirme aşamasındadır.
+> This project is under active development.
 
-**Tamamlanan:**
-- [x] Backend API (tüm endpoint'ler)
-- [x] Hibrit RAG pipeline
-- [x] Agentic materyal üretim pipeline (LangGraph)
-- [x] ABC davranış analizi (Voice-to-Action)
-- [x] Frontend temel sayfalar
-- [x] 9/9 entegrasyon testi geçti
+**Completed:**
+- [x] Full backend API (all endpoints)
+- [x] Hybrid RAG pipeline (pgvector + full-text search)
+- [x] Agentic material generation pipeline (LangGraph)
+- [x] ABC behavior analysis (Text-to-Action)
+- [x] Frontend core pages
+- [x] 9/9 integration tests passing
 
-**Devam Eden:**
-- [ ] Ses kaydı ile gözlem (tarayıcı mikrofon entegrasyonu)
-- [ ] BEP otomatik üretimi (RAG destekli)
+**In Progress:**
+- [ ] Voice recording for observations (browser microphone)
+- [ ] AI-assisted IEP generation (RAG-powered)
 - [ ] Deployment (Docker Compose + Nginx)
-- [ ] Kapsamlı unit testler
+- [ ] Comprehensive unit test coverage
 
 ---
 
-## 👨‍💻 Geliştirici
+## 👨‍💻 Developer
 
-**Ömer Panay** — Backend & AI Pipeline geliştirme  
-Capstone Projesi, 2025-2026
+**Ömer Panay** — Backend & AI Pipeline development  
+Capstone Project, 2025–2026

@@ -26,16 +26,21 @@ export default function Dashboard() {
   }, []);
 
   const stats = [
-    { label: 'Toplam Kaynak', value: data?.source_stats.total_sources ?? '...', icon: FileText, color: 'var(--color-primary-light)' },
-    { label: 'RAG Sorguları', value: data?.source_stats.total_queries ?? '...', icon: MessageSquareText, color: 'var(--color-accent)' },
-    { label: 'Öğrenciler', value: data?.total_students ?? '...', icon: Users, color: 'var(--color-warning)' },
+    { label: 'Academic Sources', value: data?.source_stats.total_sources ?? '...', icon: FileText, color: 'var(--color-primary-light)' },
+    { label: 'RAG Queries', value: data?.source_stats.total_queries ?? '...', icon: MessageSquareText, color: 'var(--color-accent)' },
+    { label: 'Students', value: data?.total_students ?? '...', icon: Users, color: 'var(--color-warning)' },
   ];
+
+  const DISABILITY_LABELS: Record<string, string> = {
+    disleksi: 'Dyslexia', otizm: 'Autism Spectrum', zihin_yetersizligi: 'Intellectual Disability',
+    isitme: 'Hearing Impairment', bedensel: 'Physical Disability', dehb: 'ADHD',
+  };
 
   return (
     <div>
       <div className="page-header">
         <h2><LayoutDashboard size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />Dashboard</h2>
-        <p>EduRAG platformuna hoş geldiniz</p>
+        <p>Welcome to EduRAG — AI-powered special education assistant</p>
       </div>
 
       {loading ? (
@@ -52,14 +57,14 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Hızlı Erişim */}
+          {/* Quick Access */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 24 }}>
             {[
-              { to: '/query', icon: MessageSquareText, title: 'Soru Sor', desc: 'Akademik kaynaklara dayalı soru sorun', color: 'var(--color-primary)' },
-              { to: '/sources', icon: FileText, title: 'Kaynaklar', desc: 'PDF yükleyin ve yönetin', color: 'var(--color-accent)' },
-              { to: '/students', icon: Users, title: 'Öğrenciler', desc: 'Öğrenci profillerini yönetin', color: 'var(--color-warning)' },
-              { to: '/observations', icon: Eye, title: 'Gözlem Kayıt', desc: 'AI destekli ABC davranış analizi', color: '#f59e0b' },
-              { to: '/materials', icon: Sparkles, title: 'Materyal Üretici', desc: 'Kişiselleştirilmiş sosyal öykü üretin', color: '#8b5cf6' },
+              { to: '/query', icon: MessageSquareText, title: 'Ask a Question', desc: 'Query academic sources with AI', color: 'var(--color-primary)' },
+              { to: '/sources', icon: FileText, title: 'Sources', desc: 'Upload and manage PDF documents', color: 'var(--color-accent)' },
+              { to: '/students', icon: Users, title: 'Students', desc: 'Manage student profiles', color: 'var(--color-warning)' },
+              { to: '/observations', icon: Eye, title: 'Observations', desc: 'AI-powered ABC behavior analysis', color: '#f59e0b' },
+              { to: '/materials', icon: Sparkles, title: 'Material Generator', desc: 'Generate personalized social stories', color: '#8b5cf6' },
             ].map((item, i) => (
               <Link key={i} to={item.to} className="card" style={{ textDecoration: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
@@ -76,10 +81,10 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Öğrenci Özeti */}
+          {/* Recent Students */}
           {data && data.students_summary.length > 0 && (
             <div className="card">
-              <h3 style={{ fontSize: '1rem', marginBottom: 16 }}>Son Eklenen Öğrenciler</h3>
+              <h3 style={{ fontSize: '1rem', marginBottom: 16 }}>Recently Added Students</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {data.students_summary.slice(0, 5).map(s => (
                   <div key={s.id} style={{
@@ -88,7 +93,7 @@ export default function Dashboard() {
                   }}>
                     <span style={{ fontWeight: 500 }}>{s.name}</span>
                     <span className={`badge ${s.disability_type === 'disleksi' ? 'badge-meb' : s.disability_type === 'otizm' ? 'badge-makale' : 'badge-yok'}`}>
-                      {s.disability_type}
+                      {DISABILITY_LABELS[s.disability_type] || s.disability_type}
                     </span>
                   </div>
                 ))}

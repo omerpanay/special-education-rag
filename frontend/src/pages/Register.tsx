@@ -25,8 +25,8 @@ export default function Register() {
       <div className="auth-container">
         <div className="auth-card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎉</div>
-          <h2>Kayıt Başarılı!</h2>
-          <p className="auth-subtitle">Giriş sayfasına yönlendiriliyorsunuz...</p>
+          <h2>Registration Successful!</h2>
+          <p className="auth-subtitle">Redirecting to login page...</p>
         </div>
       </div>
     );
@@ -38,34 +38,34 @@ export default function Register() {
         <div style={{ textAlign: 'center', marginBottom: 8 }}>
           <GraduationCap size={40} color="var(--color-primary-light)" />
         </div>
-        <h2>Hesap Oluştur</h2>
-        <p className="auth-subtitle">EduRAG platformuna kayıt olun</p>
+        <h2>Create Account</h2>
+        <p className="auth-subtitle">Register to access EduRAG platform</p>
 
         {error && <div className="alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="fullName"><User size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Ad Soyad</label>
-            <input id="fullName" type="text" className="form-input" placeholder="Ayşe Yılmaz"
+            <label htmlFor="fullName"><User size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Full Name</label>
+            <input id="fullName" type="text" className="form-input" placeholder="Jane Smith"
               value={fullName} onChange={e => { setFullName(e.target.value); clearError(); }} required />
           </div>
           <div className="form-group">
-            <label htmlFor="regEmail"><Mail size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />E-posta</label>
-            <input id="regEmail" type="email" className="form-input" placeholder="ornek@okul.edu.tr"
+            <label htmlFor="regEmail"><Mail size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Email</label>
+            <input id="regEmail" type="email" className="form-input" placeholder="teacher@school.edu"
               value={email} onChange={e => { setEmail(e.target.value); clearError(); }} required />
           </div>
           <div className="form-group">
-            <label htmlFor="regPassword"><Lock size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Şifre</label>
-            <input id="regPassword" type="password" className="form-input" placeholder="En az 6 karakter"
+            <label htmlFor="regPassword"><Lock size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Password</label>
+            <input id="regPassword" type="password" className="form-input" placeholder="At least 6 characters"
               value={password} onChange={e => { setPassword(e.target.value); clearError(); }} required minLength={6} />
           </div>
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isLoading}>
-            {isLoading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
+            {isLoading ? 'Creating account...' : 'Register'}
           </button>
         </form>
 
         <div className="auth-footer">
-          Zaten hesabınız var mı? <Link to="/login">Giriş Yapın</Link>
+          Already have an account? <Link to="/login">Sign In</Link>
         </div>
       </div>
     </div>

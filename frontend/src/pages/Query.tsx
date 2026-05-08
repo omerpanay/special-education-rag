@@ -23,17 +23,17 @@ interface ConversationSummary {
 }
 
 const DISABILITY_LABELS: Record<string, string> = {
-  disleksi: 'Disleksi', otizm: 'Otizm', zihin_yetersizligi: 'Zihinsel Yetrs.',
-  isitme: 'İşitme Yetrs.', bedensel: 'Bedensel Yetrs.', dehb: 'DEHB',
+  disleksi: 'Dyslexia', otizm: 'Autism', zihin_yetersizligi: 'Intellectual Dis.',
+  isitme: 'Hearing Imp.', bedensel: 'Physical Dis.', dehb: 'ADHD',
 };
 const DISABILITY_EMOJI: Record<string, string> = {
   disleksi: '📖', otizm: '🧩', zihin_yetersizligi: '🧠',
   isitme: '👂', bedensel: '♿', dehb: '⚡',
 };
 const SUGGESTIONS = [
-  'Okuma güçlüğü çeken öğrencilere hangi stratejiler uygulanmalıdır?',
-  'Otizmli öğrencilerde sosyal beceri nasıl geliştirilir?',
-  'Sınıf ortamında dikkat eksikliği nasıl yönetilir?',
+  'What strategies should be applied to students with reading difficulties?',
+  'How can social skills be developed in students with autism?',
+  'How can attention deficit be managed in a classroom setting?',
 ];
 
 export default function Query() {
@@ -75,7 +75,7 @@ export default function Query() {
     } catch {}
   };
 
-  // Öğrenci değiştiğinde YENİ konuşma başlat
+  // Start a new conversation when student changes
   const handleStudentChange = (id: string) => {
     setSelectedStudentId(id);
     setConversationId(null);
@@ -140,14 +140,14 @@ export default function Query() {
       }]);
       fetchConversations();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally { setLoading(false); }
   };
 
   const handleSuggestion = (text: string) => { setQuery(text); };
 
   const selectedStudent = students.find(s => s.id === selectedStudentId);
-  // Seçili öğrenciye göre konuşmaları filtrele
+  // Filter conversations by selected student
   const filteredConversations = selectedStudentId
     ? conversations.filter(c => c.student_id === selectedStudentId)
     : conversations;
@@ -156,39 +156,39 @@ export default function Query() {
 
   return (
     <div className="chat-page">
-      {/* ── Sol Panel ── */}
+      {/* ── Left Panel ── */}
       <aside className="chat-sidebar">
         <button className="chat-new-btn" onClick={startNewConversation}>
-          <Plus size={16} /> Yeni Konuşma
+          <Plus size={16} /> New Conversation
         </button>
 
-        {/* Öğrenci Seçici */}
+        {/* Student Selector */}
         <div className="chat-student-picker">
-          <label><GraduationCap size={13} /> Öğrenci</label>
+          <label><GraduationCap size={13} /> Student</label>
           <select className="form-select" value={selectedStudentId} onChange={e => handleStudentChange(e.target.value)}>
-            <option value="">🌐 Genel Sorgu</option>
+            <option value="">🌐 General Query</option>
             {students.map(s => (
               <option key={s.id} value={s.id}>
-                {DISABILITY_EMOJI[s.disability_type] || '👤'} {s.name} — {s.grade_level}. Sınıf
+                {DISABILITY_EMOJI[s.disability_type] || '👤'} {s.name} — Grade {s.grade_level}
               </option>
             ))}
           </select>
           {selectedStudent && (
             <div className="chat-student-badge">
               <span className="chat-student-dot" />
-              {DISABILITY_LABELS[selectedStudent.disability_type]} · Kişiselleştirilmiş
+              {DISABILITY_LABELS[selectedStudent.disability_type]} · Personalized
             </div>
           )}
         </div>
 
-        {/* Konuşma Geçmişi */}
+        {/* Conversation History */}
         <div className="chat-history">
           <div className="chat-history-title">
-            {selectedStudent ? `${selectedStudent.name} Konuşmaları` : 'Tüm Konuşmalar'}
+            {selectedStudent ? `${selectedStudent.name}'s Conversations` : 'All Conversations'}
             <span className="chat-history-count">{filteredConversations.length}</span>
           </div>
           {filteredConversations.length === 0 && (
-            <div className="chat-history-empty">Henüz konuşma yok</div>
+            <div className="chat-history-empty">No conversations yet</div>
           )}
           {filteredConversations.map(conv => (
             <div key={conv.id}
@@ -200,7 +200,7 @@ export default function Query() {
                   <div className="chat-conv-title">{conv.title}</div>
                   <div className="chat-conv-meta">
                     {conv.student_name && <span>{conv.student_name} · </span>}
-                    {conv.message_count} mesaj · {new Date(conv.created_at).toLocaleDateString('tr-TR')}
+                    {conv.message_count} messages · {new Date(conv.created_at).toLocaleDateString('en-US')}
                   </div>
                 </div>
               </div>
@@ -212,20 +212,20 @@ export default function Query() {
         </div>
       </aside>
 
-      {/* ── Sağ Panel: Chat ── */}
+      {/* ── Right Panel: Chat ── */}
       <main className="chat-main">
-        {/* Mesajlar */}
+        {/* Messages */}
         <div className="chat-messages">
           {messages.length === 0 ? (
             <div className="chat-welcome">
               <div className="chat-welcome-icon">
                 <Sparkles size={40} />
               </div>
-              <h2>Merhaba! 👋</h2>
+              <h2>Hello! 👋</h2>
               <p>
                 {selectedStudent
-                  ? `${selectedStudent.name} hakkında sormak istediğiniz bir şey var mı?`
-                  : 'Özel eğitim alanında size nasıl yardımcı olabilirim?'}
+                  ? `Ask anything about ${selectedStudent.name} or their learning needs.`
+                  : 'How can I help you with special education today?'}
               </p>
               <div className="chat-suggestions">
                 {SUGGESTIONS.map((s, i) => (
@@ -244,14 +244,14 @@ export default function Query() {
                   </div>
                   <div className={`chat-bubble ${msg.role}`}>
                     {msg.is_fallback && (
-                      <div className="chat-fallback-tag">⚠️ Kaynak bulunamadı</div>
+                      <div className="chat-fallback-tag">⚠️ No relevant source found</div>
                     )}
                     <div className="chat-bubble-text">{msg.content}</div>
 
                     {/* Citations */}
                     {msg.citations && msg.citations.length > 0 && (
                       <div className="chat-citations">
-                        <BookOpen size={12} /> Kaynaklar
+                        <BookOpen size={12} /> Sources
                         <div className="chat-citation-chips">
                           {msg.citations.map((c, ci) => (
                             <span key={ci} className="chat-citation-chip">
@@ -279,7 +279,7 @@ export default function Query() {
                         )}
                         {msg.response_id && feedbackSent[msg.response_id] !== undefined && (
                           <span className="chat-feedback-done">
-                            {feedbackSent[msg.response_id] ? '✅ Teşekkürler!' : '📝 Kaydedildi'}
+                            {feedbackSent[msg.response_id] ? '✅ Thanks!' : '📝 Recorded'}
                           </span>
                         )}
                       </div>
@@ -306,11 +306,11 @@ export default function Query() {
         <form className="chat-input-bar" onSubmit={handleSubmit}>
           {selectedStudent && (
             <div className="chat-input-context">
-              {DISABILITY_EMOJI[selectedStudent.disability_type]} {selectedStudent.name} · {selectedStudent.grade_level}. Sınıf
+              {DISABILITY_EMOJI[selectedStudent.disability_type]} {selectedStudent.name} · Grade {selectedStudent.grade_level}
             </div>
           )}
           <div className="chat-input-row">
-            <textarea className="chat-input" rows={1} placeholder="Sorunuzu yazın…" value={query}
+            <textarea className="chat-input" rows={1} placeholder="Type your question…" value={query}
               onChange={e => { setQuery(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'; }}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
               required minLength={3} />
