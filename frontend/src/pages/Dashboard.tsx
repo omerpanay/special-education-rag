@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LayoutDashboard, FileText, MessageSquareText, Users, ArrowRight } from 'lucide-react';
+import { LayoutDashboard, FileText, MessageSquareText, Users, ArrowRight, Eye, Sparkles } from 'lucide-react';
 
 const API = 'http://localhost:8000/api/v1';
 const getToken = () => localStorage.getItem('access_token');
@@ -58,6 +58,8 @@ export default function Dashboard() {
               { to: '/query', icon: MessageSquareText, title: 'Soru Sor', desc: 'Akademik kaynaklara dayalı soru sorun', color: 'var(--color-primary)' },
               { to: '/sources', icon: FileText, title: 'Kaynaklar', desc: 'PDF yükleyin ve yönetin', color: 'var(--color-accent)' },
               { to: '/students', icon: Users, title: 'Öğrenciler', desc: 'Öğrenci profillerini yönetin', color: 'var(--color-warning)' },
+              { to: '/observations', icon: Eye, title: 'Gözlem Kayıt', desc: 'AI destekli ABC davranış analizi', color: '#f59e0b' },
+              { to: '/materials', icon: Sparkles, title: 'Materyal Üretici', desc: 'Kişiselleştirilmiş sosyal öykü üretin', color: '#8b5cf6' },
             ].map((item, i) => (
               <Link key={i} to={item.to} className="card" style={{ textDecoration: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>

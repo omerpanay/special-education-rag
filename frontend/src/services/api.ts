@@ -147,9 +147,9 @@ export function logout(): void {
   window.location.href = '/login';
 }
 
-// RAG Query
+// RAG Query — trailing slash zorunlu (backend redirect yapar)
 export async function askQuestion(data: QueryRequest): Promise<QueryResponse> {
-  return request<QueryResponse>('/query', {
+  return request<QueryResponse>('/query/', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -174,4 +174,83 @@ export async function uploadSource(
     method: 'POST',
     body: formData,
   });
+}
+
+// ── Observations (Gözlem) ──
+export interface ObservationCreate {
+  student_id: string;
+  category: string;
+  summary: string;
+  antecedent?: string;
+  behavior?: string;
+  consequence?: string;
+}
+
+export interface ObservationOut {
+  id: string;
+  student_id: string;
+  category: string;
+  summary: string;
+  antecedent: string | null;
+  behavior: string | null;
+  consequence: string | null;
+  raw_transcript: string;
+  structuring_latency_ms: number | null;
+  created_at: string;
+}
+
+export interface ObservationListResponse {
+  student_id: string;
+  total: number;
+  observations: ObservationOut[];
+}
+
+export async function createObservation(data: ObservationCreate): Promise<ObservationOut> {
+  return request<ObservationOut>('/observations/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getObservations(studentId: string): Promise<ObservationListResponse> {
+  return request<ObservationListResponse>(`/observations/${studentId}`);
+}
+
+// ── Materials (Materyal Üretici) ──
+export interface MaterialGenerateRequest {
+  student_id: string;
+  material_type: 'social_story';
+  interest_topic: string;
+  scene_count?: number;
+}
+
+export interface MaterialScene {
+  order: number;
+  text: string;
+  image_path?: string;
+}
+
+export interface MaterialOut {
+  id: string;
+  student_id: string;
+  material_type: string;
+  title: string;
+  status: string;
+  pdf_path: string | null;
+  content: {
+    scenes: MaterialScene[];
+    metadata?: { generation_time_ms?: number };
+  };
+  created_at: string;
+}
+
+export async function generateMaterial(data: MaterialGenerateRequest): Promise<MaterialOut> {
+  return request<MaterialOut>('/materials/generate', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getStudentMaterials(studentId: string): Promise<MaterialOut[]> {
+  return request<MaterialOut[]>(`/materials/student/${studentId}`);
 }

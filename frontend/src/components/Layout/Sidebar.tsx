@@ -8,6 +8,8 @@ import {
   LogOut,
   GraduationCap,
   ClipboardList,
+  Eye,
+  Sparkles,
 } from 'lucide-react';
 
 const navItems = [
@@ -15,6 +17,8 @@ const navItems = [
   { to: '/query', icon: MessageSquareText, label: 'Soru Sor' },
   { to: '/sources', icon: FileText, label: 'Kaynaklar' },
   { to: '/students', icon: Users, label: 'Öğrenciler' },
+  { to: '/observations', icon: Eye, label: 'Gözlem Kayıt' },
+  { to: '/materials', icon: Sparkles, label: 'Materyal Üretici' },
   { to: '/iep', icon: ClipboardList, label: 'BEP Üretici' },
 ];
 

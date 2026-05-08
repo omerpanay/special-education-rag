@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   User, ArrowLeft, FileText, MessageSquare,
-  Shield, ShieldCheck, ClipboardList, TrendingUp,
+  Shield, ShieldCheck, ClipboardList, Eye, Sparkles,
 } from 'lucide-react';
+import { getObservations, getStudentMaterials, type ObservationOut, type MaterialOut } from '../services/api';
 
 const API = 'http://localhost:8000/api/v1';
 const getToken = () => localStorage.getItem('access_token');
@@ -44,6 +45,8 @@ export default function StudentDashboard() {
   const [consent, setConsent] = useState<ConsentStatus | null>(null);
   const [ieps, setIeps] = useState<IEPSummary[]>([]);
   const [conversations, setConversations] = useState<ConvSummary[]>([]);
+  const [observations, setObservations] = useState<ObservationOut[]>([]);
+  const [materials, setMaterials] = useState<MaterialOut[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -70,9 +73,17 @@ export default function StudentDashboard() {
       }
       if (convRes.ok) {
         const data = await convRes.json();
-        // Sadece bu öğrenciyle ilgili konuşmaları filtrele
         setConversations(data.items || []);
       }
+      // Gözlem ve materyal verileri
+      try {
+        const obsData = await getObservations(id);
+        setObservations(obsData.observations || []);
+      } catch { /* sessiz */ }
+      try {
+        const matData = await getStudentMaterials(id);
+        setMaterials(Array.isArray(matData) ? matData : []);
+      } catch { /* sessiz */ }
     } catch { /* silent */ }
     setLoading(false);
   };
@@ -147,9 +158,14 @@ export default function StudentDashboard() {
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Konuşma</div>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
-          <TrendingUp size={28} color="var(--color-warning)" />
-          <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>—</div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Oyun Oturumu</div>
+          <Eye size={28} color="#f59e0b" />
+          <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{observations.length}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Gözlem</div>
+        </div>
+        <div className="card" style={{ textAlign: 'center', padding: 20 }}>
+          <Sparkles size={28} color="#8b5cf6" />
+          <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{materials.length}</div>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Materyal</div>
         </div>
       </div>
 
@@ -270,29 +286,68 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* Konuşma Geçmişi */}
+        {/* Son Gözlemler */}
         <div className="card">
           <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <MessageSquare size={18} /> Son Konuşmalar
+            <Eye size={18} /> Son Gözlemler
           </h3>
-          {conversations.length === 0 ? (
+          {observations.length === 0 ? (
             <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Henüz konuşma yok.
-              <Link to="/query" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Soru Sor →</Link>
+              Henüz gözlem kaydı yok.
+              <Link to="/observations" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Kaydet →</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {conversations.slice(0, 5).map(conv => (
-                <div key={conv.id} style={{
-                  padding: '8px 12px', borderRadius: 6,
+              {observations.slice(0, 4).map(obs => (
+                <div key={obs.id} style={{
+                  padding: '10px 12px', borderRadius: 6,
                   background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
                 }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>
-                    {conv.title.length > 60 ? conv.title.slice(0, 60) + '...' : conv.title}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.72rem', padding: '1px 8px', borderRadius: 20, background: '#f59e0b25', color: '#f59e0b', fontWeight: 600 }}>
+                      {obs.category}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                      {new Date(obs.created_at).toLocaleDateString('tr-TR')}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                    {conv.message_count} mesaj · {new Date(conv.created_at).toLocaleDateString('tr-TR')}
+                  <div style={{ fontSize: '0.82rem' }}>{obs.summary.slice(0, 80)}{obs.summary.length > 80 ? '…' : ''}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Son Materyaller */}
+        <div className="card">
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Sparkles size={18} /> Son Materyaller
+          </h3>
+          {materials.length === 0 ? (
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              Henüz materyal yok.
+              <Link to="/materials" style={{ marginLeft: 8, color: 'var(--color-primary-light)' }}>Üret →</Link>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {materials.slice(0, 4).map(mat => (
+                <div key={mat.id} style={{
+                  padding: '10px 12px', borderRadius: 6,
+                  background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{mat.title}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                      {mat.content?.scenes?.length ?? 0} sahne · {new Date(mat.created_at).toLocaleDateString('tr-TR')}
+                    </div>
                   </div>
+                  <span style={{
+                    fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, color: '#fff',
+                    background: mat.status === 'completed' ? 'var(--color-accent)' : 'var(--color-warning)',
+                  }}>
+                    {mat.status === 'completed' ? 'Tamamlandı' : mat.status}
+                  </span>
                 </div>
               ))}
             </div>

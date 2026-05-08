@@ -11,6 +11,8 @@ import Sources from './pages/Sources';
 import Students from './pages/Students';
 import IEPGenerator from './pages/IEPGenerator';
 import StudentDashboard from './pages/StudentDashboard';
+import Observations from './pages/Observations';
+import Materials from './pages/Materials';
 
 function AppLayout() {
   return (
@@ -40,6 +42,8 @@ export default function App() {
             <Route path="/students" element={<Students />} />
             <Route path="/student/:studentId" element={<StudentDashboard />} />
             <Route path="/iep" element={<IEPGenerator />} />
+            <Route path="/observations" element={<Observations />} />
+            <Route path="/materials" element={<Materials />} />
           </Route>
         </Routes>
       </AuthProvider>
