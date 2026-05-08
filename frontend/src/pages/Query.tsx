@@ -3,7 +3,7 @@ import { askQuestion } from '../services/api';
 import type { QueryResponse } from '../types';
 import {
   Send, BookOpen, Clock, Sparkles, Plus, MessageSquare, Trash2,
-  ThumbsUp, ThumbsDown, User, Bot, GraduationCap,
+  ThumbsUp, ThumbsDown, User, Bot, GraduationCap, Copy, Check,
 } from 'lucide-react';
 
 const API = 'http://localhost:8000/api/v1';
@@ -43,6 +43,7 @@ export default function Query() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [feedbackSent, setFeedbackSent] = useState<Record<string, boolean>>({});
+  const [copied, setCopied] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
@@ -104,6 +105,13 @@ export default function Query() {
       });
       setFeedbackSent(prev => ({ ...prev, [responseId]: isHelpful }));
     } catch {}
+  };
+
+  const handleCopy = (text: string, idx: number) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(idx);
+      setTimeout(() => setCopied(null), 2000);
+    });
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -271,6 +279,15 @@ export default function Query() {
                         {msg.total_latency_ms && (
                           <span className="chat-latency"><Clock size={10} /> {(msg.total_latency_ms / 1000).toFixed(1)}s</span>
                         )}
+                        {/* Copy button */}
+                        <button
+                          className="chat-feedback-btns"
+                          onClick={() => handleCopy(msg.content, idx)}
+                          title="Copy answer"
+                          style={{ background: 'none', border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '3px 7px', cursor: 'pointer', color: copied === idx ? 'var(--color-accent)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.68rem', transition: 'all 0.15s' }}
+                        >
+                          {copied === idx ? <><Check size={11} /> Copied</> : <><Copy size={11} /> Copy</>}
+                        </button>
                         {msg.response_id && feedbackSent[msg.response_id] === undefined && (
                           <div className="chat-feedback-btns">
                             <button onClick={() => sendFeedback(msg.response_id!, true)}><ThumbsUp size={12} /></button>
@@ -284,6 +301,7 @@ export default function Query() {
                         )}
                       </div>
                     )}
+
                   </div>
                 </div>
               ))}
