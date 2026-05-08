@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Layout/Sidebar';
+import { useBackendHealth } from './hooks/useBackendHealth';
+import { AlertTriangle, X } from 'lucide-react';
+import { useState } from 'react';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,15 +16,53 @@ import IEPGenerator from './pages/IEPGenerator';
 import StudentDashboard from './pages/StudentDashboard';
 import Observations from './pages/Observations';
 import Materials from './pages/Materials';
+import NotFound from './pages/NotFound';
+
+function OfflineBanner() {
+  const status = useBackendHealth(30_000);
+  const [dismissed, setDismissed] = useState(false);
+
+  if (status !== 'offline' || dismissed) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+      background: 'rgba(239,68,68,0.95)',
+      backdropFilter: 'blur(8px)',
+      padding: '10px 20px',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+      fontSize: '0.88rem', fontWeight: 600, color: '#fff',
+      boxShadow: '0 2px 16px rgba(239,68,68,0.4)',
+      animation: 'slideDown 0.3s ease',
+    }}>
+      <AlertTriangle size={16} />
+      Backend is offline — make sure the FastAPI server is running on port 8000
+      <button
+        onClick={() => setDismissed(true)}
+        style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: '#fff', opacity: 0.8, marginLeft: 8, padding: 2,
+          display: 'flex', alignItems: 'center',
+        }}
+        title="Dismiss"
+      >
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
 
 function AppLayout() {
   return (
-    <div className="app-layout">
-      <Sidebar />
-      <main className="main-content">
-        <Outlet />
-      </main>
-    </div>
+    <>
+      <OfflineBanner />
+      <div className="app-layout">
+        <Sidebar />
+        <main className="main-content">
+          <Outlet />
+        </main>
+      </div>
+    </>
   );
 }
 
@@ -45,6 +86,9 @@ export default function App() {
             <Route path="/observations" element={<Observations />} />
             <Route path="/materials" element={<Materials />} />
           </Route>
+
+          {/* 404 catch-all */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

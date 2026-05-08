@@ -1,6 +1,6 @@
 /* ============================================
  * EduRAG Frontend — Auth Context
- * JWT state yönetimi, login/logout, auto-refresh
+ * JWT state management, login/logout, auto-refresh
  * ============================================ */
 
 import {
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!state.isAuthenticated) return;
 
-    // Her 13 dakikada refresh (token 15dk'da expire olur)
+    // Auto-refresh every 13 minutes (token expires at 15 min)
     const interval = setInterval(async () => {
       try {
         const refreshToken = localStorage.getItem('refresh_token');
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setState({ isAuthenticated: false, isLoading: false, error: null });
         }
       } catch {
-        // Sessizce hata yut, sonraki API çağrısında yakalanır
+        // Silently absorb — caught on next API call
       }
     }, 13 * 60 * 1000);
 
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiLogin(data);
       setState({ isAuthenticated: true, isLoading: false, error: null });
     } catch (err) {
-      const message = err instanceof ApiError ? err.detail : 'Giriş başarısız';
+      const message = err instanceof ApiError ? err.detail : 'Login failed';
       setState({ isAuthenticated: false, isLoading: false, error: message });
       throw err;
     }
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRegister(data);
       setState(prev => ({ ...prev, isLoading: false, error: null }));
     } catch (err) {
-      const message = err instanceof ApiError ? err.detail : 'Kayıt başarısız';
+      const message = err instanceof ApiError ? err.detail : 'Registration failed';
       setState(prev => ({ ...prev, isLoading: false, error: message }));
       throw err;
     }

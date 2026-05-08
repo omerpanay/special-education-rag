@@ -17,7 +17,7 @@ import type {
 
 const BASE_URL = 'http://localhost:8000/api/v1';
 
-// ── Token Yönetimi ──
+// ── Token Management ──
 export function getAccessToken(): string | null {
   return localStorage.getItem('access_token');
 }
@@ -36,7 +36,7 @@ export function clearTokens(): void {
   localStorage.removeItem('refresh_token');
 }
 
-// ── Hata Sınıfı ──
+// ── Error Class ──
 export class ApiError extends Error {
   status: number;
   detail: string;
@@ -48,7 +48,7 @@ export class ApiError extends Error {
   }
 }
 
-// ── Temel HTTP İstek Fonksiyonu ──
+// ── Base HTTP Request Function ──
 async function request<T>(
   url: string,
   options: RequestInit = {},
@@ -60,7 +60,7 @@ async function request<T>(
     ...(options.headers as Record<string, string> || {}),
   };
 
-  // Multipart form gönderirken Content-Type'ı browser'a bırak
+  // Let browser set Content-Type for multipart form data
   if (!(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
@@ -74,7 +74,7 @@ async function request<T>(
     headers,
   });
 
-  // Token expired → refresh dene
+  // Token expired → try refresh
   if (res.status === 401 && retry) {
     const refreshed = await tryRefreshToken();
     if (refreshed) {
@@ -82,11 +82,11 @@ async function request<T>(
     }
     clearTokens();
     window.location.href = '/login';
-    throw new ApiError(401, 'Oturum süresi doldu');
+    throw new ApiError(401, 'Session expired. Please log in again.');
   }
 
   if (!res.ok) {
-    let detail = 'Bilinmeyen hata';
+    let detail = 'Unknown error';
     try {
       const err = await res.json();
       detail = err.detail || JSON.stringify(err);
@@ -123,7 +123,7 @@ async function tryRefreshToken(): Promise<boolean> {
   }
 }
 
-// ── API Fonksiyonları ──
+// ── API Functions ──
 
 // Auth
 export async function register(data: TeacherRegister): Promise<TeacherResponse> {
@@ -147,7 +147,7 @@ export function logout(): void {
   window.location.href = '/login';
 }
 
-// RAG Query — trailing slash zorunlu (backend redirect yapar)
+// RAG Query — trailing slash required (backend redirect)
 export async function askQuestion(data: QueryRequest): Promise<QueryResponse> {
   return request<QueryResponse>('/query/', {
     method: 'POST',
@@ -176,7 +176,7 @@ export async function uploadSource(
   });
 }
 
-// ── Observations (Gözlem) ──
+// ── Observations ──
 export interface ObservationCreate {
   student_id: string;
   category: string;
@@ -216,7 +216,7 @@ export async function getObservations(studentId: string): Promise<ObservationLis
   return request<ObservationListResponse>(`/observations/${studentId}`);
 }
 
-// ── Materials (Materyal Üretici) ──
+// ── Materials ──
 export interface MaterialGenerateRequest {
   student_id: string;
   material_type: 'social_story';

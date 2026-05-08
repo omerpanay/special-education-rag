@@ -844,3 +844,18 @@ a:hover { text-decoration: underline; }
 .chat-send-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
 .chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* ── Offline Banner Animation ── */
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── bg-main fallback for NotFound page ── */
+.bg-main { background: var(--bg-base); }
+
+
