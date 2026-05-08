@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useBackendHealth } from '../../hooks/useBackendHealth';
 import {
   LayoutDashboard,
   MessageSquareText,
@@ -21,6 +22,55 @@ const navItems = [
   { to: '/materials', icon: Sparkles, label: 'Materials' },
   { to: '/iep', icon: ClipboardList, label: 'IEP Generator' },
 ];
+
+function BackendStatus() {
+  const status = useBackendHealth(30_000);
+
+  const config = {
+    healthy:  { color: '#10b981', label: 'API online',   pulse: true  },
+    offline:  { color: '#ef4444', label: 'API offline',  pulse: false },
+    checking: { color: '#f59e0b', label: 'Connecting…',  pulse: true  },
+  }[status];
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 8,
+      padding: '8px 14px',
+      borderRadius: 'var(--radius-sm)',
+      background: 'var(--bg-glass)',
+      border: '1px solid var(--border-subtle)',
+      marginBottom: 10,
+    }}>
+      {/* animated dot */}
+      <span style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 10, height: 10 }}>
+        {config.pulse && (
+          <span style={{
+            position: 'absolute', width: '100%', height: '100%',
+            borderRadius: '50%', background: config.color,
+            opacity: 0.4,
+            animation: 'pulse 2s ease-in-out infinite',
+          }} />
+        )}
+        <span style={{
+          width: 8, height: 8, borderRadius: '50%',
+          background: config.color, flexShrink: 0,
+        }} />
+      </span>
+      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+        {config.label}
+      </span>
+      <span style={{
+        marginLeft: 'auto', fontSize: '0.6rem',
+        padding: '1px 6px', borderRadius: 4,
+        background: config.color + '20',
+        color: config.color, fontWeight: 600,
+        textTransform: 'uppercase', letterSpacing: '0.04em',
+      }}>
+        {status === 'healthy' ? '200 OK' : status === 'offline' ? 'DOWN' : '…'}
+      </span>
+    </div>
+  );
+}
 
 export default function Sidebar() {
   const { logout } = useAuth();
@@ -47,6 +97,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
+        <BackendStatus />
         <button className="sidebar-logout" onClick={logout}>
           <LogOut size={16} />
           Sign Out

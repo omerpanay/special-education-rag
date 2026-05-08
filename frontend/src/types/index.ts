@@ -1,6 +1,6 @@
 /* ============================================
- * EduRAG Frontend — TypeScript Tipleri
- * Backend Pydantic schema'larının ayna kopyası
+ * EduRAG Frontend — TypeScript Type Definitions
+ * Mirror of backend Pydantic schemas
  * ============================================ */
 
 // ── Auth ──

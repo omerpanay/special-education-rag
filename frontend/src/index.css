@@ -12,6 +12,8 @@
   --color-warning: hsl(38, 92%, 55%);
 
   --bg-base: hsl(225, 25%, 8%);
+  --bg-main: hsl(225, 25%, 8%);        /* alias for --bg-base */
+  --bg-card: hsl(225, 18%, 13%);       /* alias for --bg-surface */
   --bg-surface: hsl(225, 18%, 13%);
   --bg-elevated: hsl(225, 18%, 17%);
   --bg-glass: rgba(255, 255, 255, 0.04);
