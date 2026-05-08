@@ -44,3 +44,12 @@ api_v1_router.include_router(conversations_router)
 # ── Phase 5: KVKK Consent ──
 from app.api.v1.consent import router as consent_router
 api_v1_router.include_router(consent_router)
+
+# ── Phase 6: Agentic Features ──
+# Sesli Gözlem (Voice-to-Action with Groq Whisper)
+from app.api.v1.observations import router as observations_router
+api_v1_router.include_router(observations_router)
+
+# Agentic Materyal Üretici (LangGraph + HuggingFace)
+from app.api.v1.materials import router as materials_router
+api_v1_router.include_router(materials_router)

@@ -37,6 +37,8 @@ from app.models.feedback import Feedback  # noqa: F401
 from app.models.iep_draft import IEPDraft  # noqa: F401
 from app.models.conversation import Conversation, ConversationMessage  # noqa: F401
 from app.models.consent import Consent  # noqa: F401
+from app.models.observation import Observation  # noqa: F401
+from app.models.material import Material  # noqa: F401
 
 target_metadata = Base.metadata
 

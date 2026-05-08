@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     cosine_threshold: float = 0.70
 
     # ── Güvenlik ──
-    secret_key: str = "change-me-to-a-random-secret-key"
+    secret_key: str  # .env'de tanımlanması zorunlu — varsayılan yok
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 7
@@ -50,6 +50,16 @@ class Settings(BaseSettings):
     # ── Uygulama ──
     app_name: str = "EduRAG"
     debug: bool = False
+
+    # ── Agentic RAG (Faz 1) ──
+    tavily_api_key: str = ""            # Yoksa web arama devre dışı kalır
+    web_search_enabled: bool = True     # Feature flag
+
+    # ── HuggingFace (Faz 3) ──
+    huggingface_api_token: str = ""
+
+    # ── Whisper STT (Faz 2) ──
+    whisper_model: str = "whisper-large-v3-turbo"
 
 
 @lru_cache

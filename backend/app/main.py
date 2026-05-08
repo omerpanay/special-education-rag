@@ -14,8 +14,11 @@ from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
 import structlog
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.core.config import get_settings
 from app.core.logging import setup_logging, get_logger
@@ -95,6 +98,12 @@ async def correlation_id_middleware(request: Request, call_next):  # type: ignor
 from app.api.v1.router import api_v1_router  # noqa: E402
 
 app.include_router(api_v1_router, prefix="/api/v1")
+
+# ── Static Dosyalar ──
+# Frontend'den PDF ve görsel URL'lerine erişim için
+STATIC_DIR = Path(__file__).parent.parent / "static"
+STATIC_DIR.mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/health")

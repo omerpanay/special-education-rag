@@ -54,3 +54,6 @@ game/Build/*.wasm
 # Spec Kit
 .specify/feature.json
 Sources/
+
+# Üretilen materyal dosyaları (görsel, PDF)
+backend/static/materials/

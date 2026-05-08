@@ -1,11 +1,12 @@
-"""RAG Core Servisi — Soru Cevaplama Orkestratörü.
+"""RAG Core Servisi — Soru Cevaplama Orkesträtörü (Adaptive RAG).
 
 ─── MİMARİ KARAR: Bu servis neden en karmaşık? ───
-Çünkü 4 farklı sistemi koordine eder:
+Çünkü 5 farklı sistemi koordine eder:
 1. Retrieval: Veritabanında hibrit arama yap
-2. Context Building: Öğrenci profili + konuşma geçmişi
-3. Generation: Bulunan bağlamı LLM'e gönder, yanıt al
-4. Observability: Her adımın süresini ölç ve kaydet
+2. Adaptive Router: Yerel yeterli mi? Web gerekli mi? Karar ver
+3. Context Building: Öğrenci profili + konuşma geçmişi + web sonuçları
+4. Generation: Birleşik bağlamı LLM'e gönder, yanıt al
+5. Observability: Her adımın süresini ölç ve kaydet
 """
 
 import logging
@@ -20,10 +21,16 @@ from sqlalchemy.orm import selectinload
 from app.models.conversation import Conversation, ConversationMessage
 from app.models.rag_response import RagResponse
 from app.models.response_chunk import ResponseChunk
+from app.rag.adaptive_router import RouteType, route_query
 from app.rag.chain import create_rag_chain
 from app.rag.context_builder import ContextBuilder
 from app.rag.retrieval import retrieve_hybrid_chunks
-from app.schemas.query import Citation, QueryRequest, QueryResponse
+from app.rag.web_search import (
+    WebSearchResult,
+    format_web_results_as_context,
+    search_web,
+)
+from app.schemas.query import Citation, QueryRequest, QueryResponse, WebCitation
 
 logger = logging.getLogger("edurag.rag")
 
@@ -38,27 +45,53 @@ class RagService:
         teacher_id: UUID,
         conversation_id: Optional[UUID] = None,
     ) -> QueryResponse:
-        """Kullanıcının sorusuna RAG ile cevap üret.
+        """Kullanıcının sorusuna Adaptive RAG ile cevap üret.
 
-        Akış:
-        1. Hibrit arama → En alakalı 5 chunk bul
-        2. Chunk'ları formatlı bağlam metnine çevir
-        3. LCEL zinciri ile LLM'e sor
-        4. Etkileşimi DB'ye kaydet (observability)
-        5. Yanıtı döndür
+        Akış (Adaptive RAG):
+        1. Yerel hibrit arama → En alakalı 5 chunk bul
+        2. Adaptive Router → Yerel yeterli mi? Web gerekli mi?
+        3. Web arama (gerekirse) → Tavily ile online kaynak bul
+        4. Birleşik bağlam oluştur (yerel + web + öğrenci + geçmiş)
+        5. LCEL zinciri ile LLM'e sor
+        6. Etkileşimi DB'ye kaydet (observability)
+        7. Yanıtı döndür
         """
         t0 = time.time()
 
-        # ── 1. RETRIEVAL ──
+        # ── 1. YEREL RETRIEVAL ──
         chunks_with_scores = await retrieve_hybrid_chunks(
             db=db, query_text=request.query, limit=5
         )
         t1 = time.time()
         retrieval_latency = (t1 - t0) * 1000  # ms
 
-        # ── 2. CONTEXT FORMATTING ──
-        # Chunk'ları LLM'in okuyacağı formata çevir
-        # Her chunk'ın hangi kaynaktan ve sayfadan geldiğini belirt
+        # ── 2. ADAPTIVE ROUTER ──
+        # Yerel sonuçların kalitesini değerlendir ve yönlendirme kararı al
+        best_local_score = (
+            max(score for _, score in chunks_with_scores)
+            if chunks_with_scores else 0.0
+        )
+        route_decision = await route_query(
+            query=request.query,
+            local_result_count=len(chunks_with_scores),
+            best_local_score=best_local_score,
+        )
+
+        logger.info(
+            f"adaptive_router_karari route={route_decision.route.value} "
+            f"reasoning={route_decision.reasoning} yerel_sonuc={len(chunks_with_scores)}"
+        )
+
+        # ── 2.1 WEB SEARCH (Router kararına göre) ──
+        web_results: list[WebSearchResult] = []
+        web_context = ""
+        if route_decision.route in (RouteType.WEB, RouteType.HYBRID):
+            search_query = route_decision.search_query or request.query
+            web_results = await search_web(query=search_query, max_results=3)
+            web_context = format_web_results_as_context(web_results)
+
+        # ── 3. CONTEXT FORMATTING ──
+        # Yerel chunk'ları LLM'in okuyacağı formata çevir
         context_parts = []
         for rank, (chunk, score) in enumerate(chunks_with_scores, 1):
             source_title = chunk.source.title if chunk.source else "Bilinmeyen"
@@ -70,11 +103,14 @@ class RagService:
 
         formatted_context = (
             "\n".join(context_parts) if context_parts
-            else "Hiçbir akademik kaynak bulunamadı."
+            else "Hiçbir yerel akademik kaynak bulunamadı."
         )
 
-        # ── 2.5 ADAPTIVE CONTEXT (Kişiselleştirme) ──
-        # student_id verilmişse öğrenci bağlamını oluştur
+        # Web sonuçlarını bağlama ekle
+        if web_context:
+            formatted_context += "\n\n" + web_context
+
+        # ── 3.5 ADAPTIVE CONTEXT (Kişiselleştirme) ──
         student_context = ""
         if request.student_id:
             student_context = await ContextBuilder.build_student_context(
@@ -88,15 +124,14 @@ class RagService:
                     + student_context
                 )
 
-        # ── 2.7 CONVERSATION HISTORY (Multi-Turn) ──
+        # ── 3.7 CONVERSATION HISTORY (Multi-Turn) ──
         conversation_context = ""
         conversation = None
         if conversation_id:
             conversation = await _get_conversation(db, conversation_id, teacher_id)
             if conversation and conversation.messages:
                 history_parts = []
-                # Son 5 mesajı al
-                recent = conversation.messages[-10:]  # 5 çift (user+assistant)
+                recent = conversation.messages[-10:]  # Son 5 çift (user+assistant)
                 for msg in recent:
                     role_label = "Öğretmen" if msg.role == "user" else "Asistan"
                     history_parts.append(f"{role_label}: {msg.content}")
@@ -107,11 +142,13 @@ class RagService:
                         + "\n### GEÇMİŞ BİTİŞİ ###\n"
                     )
 
-        # ── 3. GENERATION ──
-        # Chunk yoksa LLM'i çağırma bile → direkt fallback
-        if not chunks_with_scores:
+        # ── 4. GENERATION ──
+        # Hem yerel hem web sonuç yoksa → fallback
+        has_any_context = bool(chunks_with_scores) or bool(web_results)
+
+        if not has_any_context:
             answer = (
-                "Üzgünüm, sağlanan akademik kaynaklarda "
+                "Üzgünüm, ne yerel akademik kaynaklarda ne de web'de "
                 "bu sorunun cevabı bulunmamaktadır."
             )
         else:
@@ -131,7 +168,7 @@ class RagService:
         llm_latency = (t2 - t1) * 1000
         total_latency = (t2 - t0) * 1000
 
-        is_fallback = "bulunmamaktadır" in answer.lower() or not chunks_with_scores
+        is_fallback = "bulunmamaktadır" in answer.lower() or not has_any_context
 
         # ── 4. PERSIST (DB'YE KAYDET) ──
         rag_response = RagResponse(
@@ -168,13 +205,22 @@ class RagService:
                 similarity_score=round(score, 3),
             ))
 
+        # Web citation'ları oluştur
+        web_citations = [
+            WebCitation(
+                title=wr.title,
+                url=wr.url,
+                score=round(wr.score, 3),
+            )
+            for wr in web_results
+        ]
+
         await db.commit()
         await db.refresh(rag_response)
 
-        # ── 5. CONVERSATION PERSISTENCE ──
+        # ── 6. CONVERSATION PERSISTENCE ──
         response_uuid = UUID(str(rag_response.id))
         if conversation_id and conversation:
-            # Mevcut konuşmaya mesaj ekle
             db.add(ConversationMessage(
                 conversation_id=conversation.id,
                 role="user",
@@ -188,12 +234,14 @@ class RagService:
             ))
             await db.commit()
 
-        # ── 6. RETURN ──
+        # ── 7. RETURN ──
         return QueryResponse(
             id=response_uuid,
             answer=answer,
             citations=citations,
+            web_citations=web_citations,
             is_fallback=is_fallback,
+            route_decision=route_decision.route.value,
             total_latency_ms=total_latency,
             created_at=rag_response.created_at,
             conversation_id=str(conversation.id) if conversation else None,
