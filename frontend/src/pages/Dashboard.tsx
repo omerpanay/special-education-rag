@@ -17,19 +17,19 @@ interface DashboardData {
 }
 
 const PIPELINE_STEPS = [
-  { icon: PenLine,           label: 'Writer Agent',   desc: 'Generates scene-by-scene story text via Llama 3.1',         color: '#6366f1', bg: 'rgba(99,102,241,0.12)'  },
-  { icon: MessageSquareText, label: 'Prompt Agent',   desc: 'Converts each scene into an image-generation prompt',       color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
-  { icon: Image,             label: 'Image Agent',    desc: 'Generates illustrations via HuggingFace FLUX.1-schnell',    color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
-  { icon: FileText,          label: 'PDF Builder',    desc: 'Assembles story + images into a downloadable PDF',          color: '#10b981', bg: 'rgba(16,185,129,0.12)'  },
+  { icon: PenLine,           label: 'Writer Agent',   desc: 'Generates scene-by-scene story text via Llama 3.1',         color: '#4F6D7A', bg: 'rgba(79,109,122,0.12)'  },
+  { icon: MessageSquareText, label: 'Prompt Agent',   desc: 'Converts each scene into an image-generation prompt',       color: '#6B9080', bg: 'rgba(107,144,128,0.12)' },
+  { icon: Image,             label: 'Image Agent',    desc: 'Generates illustrations via HuggingFace FLUX.1-schnell',    color: '#E8A838', bg: 'rgba(232,168,56,0.12)' },
+  { icon: FileText,          label: 'PDF Builder',    desc: 'Assembles story + images into a downloadable PDF',          color: '#81B29A', bg: 'rgba(129,178,154,0.12)'  },
 ];
 
 const TECH_BADGES = [
-  { label: 'FastAPI',    color: '#10b981' },
-  { label: 'LangGraph',  color: '#6366f1' },
-  { label: 'pgvector',   color: '#3b82f6' },
-  { label: 'Llama 3.1',  color: '#f59e0b' },
-  { label: 'FLUX.1',     color: '#ec4899' },
-  { label: 'React + TS', color: '#38bdf8' },
+  { label: 'FastAPI',    color: '#81B29A' },
+  { label: 'LangGraph',  color: '#4F6D7A' },
+  { label: 'pgvector',   color: '#6B9080' },
+  { label: 'Llama 3.1',  color: '#E8A838' },
+  { label: 'FLUX.1',     color: '#E07A5F' },
+  { label: 'React + TS', color: '#6B8A97' },
 ];
 
 const DISABILITY_LABELS: Record<string, string> = {
@@ -55,7 +55,7 @@ export default function Dashboard() {
     { label: 'Academic Sources', value: data?.source_stats.total_sources ?? '…', icon: FileText,          color: 'var(--color-primary-light)' },
     { label: 'RAG Queries',      value: data?.source_stats.total_queries ?? '…', icon: MessageSquareText, color: 'var(--color-accent)'        },
     { label: 'Students',         value: data?.total_students ?? '…',             icon: Users,             color: 'var(--color-warning)'       },
-    { label: 'Vector Chunks',    value: data?.source_stats.total_chunks ?? '…',  icon: Database,          color: '#ec4899'                    },
+    { label: 'Vector Chunks',    value: data?.source_stats.total_chunks ?? '…',  icon: Database,          color: '#6B9080'                    },
   ];
 
   return (
@@ -86,9 +86,9 @@ export default function Dashboard() {
               { to: '/query',        icon: MessageSquareText, title: 'Ask a Question',    desc: 'Hybrid RAG over academic PDFs',             color: 'var(--color-primary)' },
               { to: '/sources',      icon: FileText,          title: 'Sources',            desc: 'Upload & index PDF documents',              color: 'var(--color-accent)'  },
               { to: '/students',     icon: Users,             title: 'Students',           desc: 'Manage student profiles',                   color: 'var(--color-warning)' },
-              { to: '/observations', icon: Eye,               title: 'Observations',       desc: 'AI-powered ABC behavior analysis',          color: '#f59e0b'              },
-              { to: '/materials',    icon: Sparkles,          title: 'Materials',          desc: 'Agentic personalized social stories',       color: '#8b5cf6'              },
-              { to: '/iep',          icon: ClipboardList,     title: 'IEP Generator',      desc: 'AI-drafted individualized education plan',  color: '#ec4899'              },
+              { to: '/observations', icon: Eye,               title: 'Observations',       desc: 'AI-powered ABC behavior analysis',          color: '#E8A838'              },
+              { to: '/materials',    icon: Sparkles,          title: 'Materials',          desc: 'Agentic personalized social stories',       color: '#6B9080'              },
+              { to: '/iep',          icon: ClipboardList,     title: 'IEP Generator',      desc: 'AI-drafted individualized education plan',  color: '#E07A5F'              },
             ].map((item, i) => (
               <Link key={i} to={item.to} className="card" style={{ textDecoration: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px' }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -108,9 +108,9 @@ export default function Dashboard() {
           {/* Agentic Pipeline Visualization */}
           <div className="card" style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 18 }}>
-              <Zap size={18} color="#8b5cf6" />
+              <Zap size={18} color="#4F6D7A" />
               <h3 style={{ fontSize: '1rem', margin: 0 }}>Multi-Agent Material Generation Pipeline</h3>
-              <span style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', fontWeight: 600 }}>
+              <span style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 4, background: 'rgba(79,109,122,0.12)', color: '#4F6D7A', fontWeight: 600 }}>
                 LangGraph
               </span>
             </div>

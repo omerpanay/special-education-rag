@@ -305,8 +305,8 @@ export default function Materials() {
           {error && !generating && (
             <div style={{
               padding: '14px 18px', borderRadius: 'var(--radius-sm)', marginBottom: 16,
-              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-              color: '#ef4444', fontSize: '0.85rem',
+              background: 'rgba(224,122,95,0.1)', border: '1px solid rgba(224,122,95,0.3)',
+              color: '#E07A5F', fontSize: '0.85rem',
             }}>
               {error}
             </div>

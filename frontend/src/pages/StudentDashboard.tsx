@@ -158,12 +158,12 @@ export default function StudentDashboard() {
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Conversations</div>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
-          <Eye size={28} color="#f59e0b" />
+          <Eye size={28} color="#E8A838" />
           <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{observations.length}</div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Observations</div>
         </div>
         <div className="card" style={{ textAlign: 'center', padding: 20 }}>
-          <Sparkles size={28} color="#8b5cf6" />
+          <Sparkles size={28} color="#6B9080" />
           <div style={{ fontSize: '2rem', fontWeight: 700, marginTop: 4 }}>{materials.length}</div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Materials</div>
         </div>
@@ -304,7 +304,7 @@ export default function StudentDashboard() {
                   background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: '0.72rem', padding: '1px 8px', borderRadius: 20, background: '#f59e0b25', color: '#f59e0b', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.72rem', padding: '1px 8px', borderRadius: 20, background: '#E8A83825', color: '#E8A838', fontWeight: 600 }}>
                       {obs.category}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>

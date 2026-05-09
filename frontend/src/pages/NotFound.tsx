@@ -8,7 +8,7 @@ export default function NotFound() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'var(--bg-main, #0f1117)',
+      background: '#0F1419',
       flexDirection: 'column',
       gap: 24,
       textAlign: 'center',
@@ -17,26 +17,26 @@ export default function NotFound() {
       <div style={{
         width: 80, height: 80,
         borderRadius: '50%',
-        background: 'rgba(239,68,68,0.1)',
-        border: '1px solid rgba(239,68,68,0.3)',
+        background: 'rgba(224,122,95,0.1)',
+        border: '1px solid rgba(224,122,95,0.3)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <AlertCircle size={36} color="#ef4444" />
+        <AlertCircle size={36} color="#E07A5F" />
       </div>
 
       <div>
         <h1 style={{
           fontSize: '5rem', fontWeight: 800, margin: 0,
-          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          background: 'linear-gradient(135deg, #4F6D7A, #6B9080)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           lineHeight: 1,
         }}>
           404
         </h1>
-        <h2 style={{ fontSize: '1.4rem', marginTop: 12, marginBottom: 8, color: '#e2e8f0' }}>
+        <h2 style={{ fontSize: '1.4rem', marginTop: 12, marginBottom: 8, color: '#E8ECF1' }}>
           Page Not Found
         </h2>
-        <p style={{ color: '#94a3b8', fontSize: '0.95rem', maxWidth: 360, margin: '0 auto' }}>
+        <p style={{ color: '#8899A6', fontSize: '0.95rem', maxWidth: 360, margin: '0 auto' }}>
           The page you're looking for doesn't exist or has been moved.
         </p>
       </div>

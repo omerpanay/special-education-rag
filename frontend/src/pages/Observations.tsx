@@ -27,17 +27,17 @@ const CATEGORY_API_MAP: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'Behavior': '#f59e0b',
-  'Academic': '#3b82f6',
-  'Crisis': '#ef4444',
-  'Social': '#8b5cf6',
-  'Communication': '#10b981',
+  'Behavior': '#E8A838',
+  'Academic': '#4F6D7A',
+  'Crisis': '#E07A5F',
+  'Social': '#6B9080',
+  'Communication': '#81B29A',
   // Turkish values (from API history)
-  'Davranış': '#f59e0b',
-  'Akademik': '#3b82f6',
-  'Kriz': '#ef4444',
-  'Sosyal': '#8b5cf6',
-  'İletişim': '#10b981',
+  'Davranış': '#E8A838',
+  'Akademik': '#4F6D7A',
+  'Kriz': '#E07A5F',
+  'Sosyal': '#6B9080',
+  'İletişim': '#81B29A',
 };
 
 const CATEGORY_DISPLAY: Record<string, string> = {
@@ -233,8 +233,8 @@ export default function Observations() {
           {error && (
             <div style={{
               marginTop: 16, padding: '12px 16px', borderRadius: 'var(--radius-sm)',
-              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-              display: 'flex', alignItems: 'center', gap: 8, color: '#ef4444', fontSize: '0.85rem',
+              background: 'rgba(224,122,95,0.1)', border: '1px solid rgba(224,122,95,0.3)',
+              display: 'flex', alignItems: 'center', gap: 8, color: '#E07A5F', fontSize: '0.85rem',
             }}>
               <AlertCircle size={16} />
               {error}
@@ -254,9 +254,9 @@ export default function Observations() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[
-                  { label: 'A — Antecedent', value: result.antecedent, color: '#f59e0b' },
-                  { label: 'B — Behavior', value: result.behavior, color: '#3b82f6' },
-                  { label: 'C — Consequence', value: result.consequence, color: '#10b981' },
+                  { label: 'A — Antecedent', value: result.antecedent, color: '#E8A838' },
+                  { label: 'B — Behavior', value: result.behavior, color: '#4F6D7A' },
+                  { label: 'C — Consequence', value: result.consequence, color: '#81B29A' },
                 ].map(item => (
                   <div key={item.label} style={{
                     padding: '10px 14px', borderRadius: 8,
@@ -343,9 +343,9 @@ export default function Observations() {
                   {expandedId === obs.id && (
                     <div style={{ padding: '12px 14px', background: 'var(--bg-card)', display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {[
-                        { label: 'A — Antecedent', value: obs.antecedent, color: '#f59e0b' },
-                        { label: 'B — Behavior', value: obs.behavior, color: '#3b82f6' },
-                        { label: 'C — Consequence', value: obs.consequence, color: '#10b981' },
+                        { label: 'A — Antecedent', value: obs.antecedent, color: '#E8A838' },
+                        { label: 'B — Behavior', value: obs.behavior, color: '#4F6D7A' },
+                        { label: 'C — Consequence', value: obs.consequence, color: '#81B29A' },
                       ].map(item => (
                         item.value && (
                           <div key={item.label} style={{

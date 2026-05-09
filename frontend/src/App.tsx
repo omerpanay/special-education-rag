@@ -28,12 +28,12 @@ function OfflineBanner() {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
-      background: 'rgba(239,68,68,0.95)',
+      background: 'rgba(224,122,95,0.95)',
       backdropFilter: 'blur(8px)',
       padding: '10px 20px',
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
       fontSize: '0.88rem', fontWeight: 600, color: '#fff',
-      boxShadow: '0 2px 16px rgba(239,68,68,0.4)',
+      boxShadow: '0 2px 16px rgba(224,122,95,0.4)',
       animation: 'slideDown 0.3s ease',
     }}>
       <AlertTriangle size={16} />

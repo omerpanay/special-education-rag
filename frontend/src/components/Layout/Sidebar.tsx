@@ -27,9 +27,9 @@ function BackendStatus() {
   const status = useBackendHealth(30_000);
 
   const config = {
-    healthy:  { color: '#10b981', label: 'API online',   pulse: true  },
-    offline:  { color: '#ef4444', label: 'API offline',  pulse: false },
-    checking: { color: '#f59e0b', label: 'Connecting…',  pulse: true  },
+    healthy:  { color: '#81B29A', label: 'API online',   pulse: true  },
+    offline:  { color: '#E07A5F', label: 'API offline',  pulse: false },
+    checking: { color: '#E8A838', label: 'Connecting…',  pulse: true  },
   }[status];
 
   return (

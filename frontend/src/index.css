@@ -1,41 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ── CSS Custom Properties (Design Tokens) ── */
+/* ══════════════════════════════════════════════
+   EduRAG Design Tokens — Stitch Design System
+   Calming · Accessible · Trustworthy
+   ══════════════════════════════════════════════ */
 :root {
-  --color-primary: hsl(230, 75%, 58%);
-  --color-primary-hover: hsl(230, 75%, 50%);
-  --color-primary-light: hsl(230, 75%, 65%);
-  --color-accent: hsl(160, 84%, 44%);
-  --color-accent-hover: hsl(160, 84%, 38%);
-  --color-danger: hsl(0, 72%, 58%);
-  --color-danger-hover: hsl(0, 72%, 50%);
-  --color-warning: hsl(38, 92%, 55%);
+  /* ── Brand Colors ── */
+  --color-primary: #4F6D7A;          /* Muted Teal — calming, professional */
+  --color-primary-hover: #3D5A66;
+  --color-primary-light: #6B8A97;
+  --color-secondary: #6B9080;        /* Sage Green — nurturing, growth */
+  --color-secondary-hover: #5A7D6E;
+  --color-accent: #E8A838;           /* Warm Amber — gentle warmth */
+  --color-accent-hover: #D4962E;
+  --color-danger: #E07A5F;           /* Soft Coral — gentle alert, NOT harsh red */
+  --color-danger-hover: #CC6A50;
+  --color-warning: #E8A838;
+  --color-success: #81B29A;          /* Eucalyptus — positive reinforcement */
 
-  --bg-base: hsl(225, 25%, 8%);
-  --bg-main: hsl(225, 25%, 8%);        /* alias for --bg-base */
-  --bg-card: hsl(225, 18%, 13%);       /* alias for --bg-surface */
-  --bg-surface: hsl(225, 18%, 13%);
-  --bg-elevated: hsl(225, 18%, 17%);
+  /* ── Surfaces (Dark Mode) ── */
+  --bg-base: #0F1419;               /* Deep navy background */
+  --bg-main: #0F1419;
+  --bg-surface: #1A2332;            /* Card surface */
+  --bg-card: #1A2332;
+  --bg-elevated: #223044;           /* Elevated elements */
   --bg-glass: rgba(255, 255, 255, 0.04);
   --bg-glass-hover: rgba(255, 255, 255, 0.07);
 
-  --text-primary: hsl(0, 0%, 95%);
-  --text-secondary: hsl(225, 15%, 60%);
-  --text-muted: hsl(225, 10%, 40%);
+  /* ── Text ── */
+  --text-primary: #E8ECF1;
+  --text-secondary: #8899A6;
+  --text-muted: #556677;
 
+  /* ── Borders ── */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-focus: var(--color-primary);
 
+  /* ── Radius ── */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
 
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 20px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  /* ── Shadows (teal-tinted for cohesion) ── */
+  --shadow-sm: 0 2px 8px rgba(15, 20, 25, 0.4);
+  --shadow-md: 0 4px 20px rgba(15, 20, 25, 0.5);
+  --shadow-lg: 0 8px 40px rgba(15, 20, 25, 0.6);
+  --shadow-glow: 0 0 20px rgba(79, 109, 122, 0.15);
 
+  /* ── Layout ── */
   --sidebar-width: 260px;
   --transition-fast: 150ms ease;
   --transition-base: 200ms ease;
@@ -114,9 +127,9 @@ a:hover { text-decoration: underline; }
 }
 
 .sidebar-link.active {
-  background: rgba(99, 102, 241, 0.12);
+  background: rgba(79, 109, 122, 0.15);
   color: var(--color-primary-light);
-  border-color: rgba(99, 102, 241, 0.2);
+  border-color: rgba(79, 109, 122, 0.25);
 }
 
 .sidebar-footer {
@@ -142,7 +155,7 @@ a:hover { text-decoration: underline; }
 .sidebar-logout:hover {
   border-color: var(--color-danger);
   color: var(--color-danger);
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(224, 122, 95, 0.08);
 }
 
 .main-content {
@@ -305,7 +318,7 @@ a:hover { text-decoration: underline; }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+  box-shadow: 0 0 0 3px rgba(79, 109, 122, 0.2);
 }
 
 .form-textarea { resize: vertical; min-height: 100px; }
@@ -322,7 +335,7 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(ellipse at top, hsl(230, 30%, 14%) 0%, var(--bg-base) 70%);
+  background: radial-gradient(ellipse at top, #1A2332 0%, var(--bg-base) 70%);
 }
 
 .auth-card {
@@ -358,8 +371,8 @@ a:hover { text-decoration: underline; }
 }
 
 .alert-error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(224, 122, 95, 0.1);
+  border: 1px solid rgba(224, 122, 95, 0.3);
   color: var(--color-danger);
   padding: 12px 16px;
   border-radius: var(--radius-sm);
@@ -456,7 +469,7 @@ a:hover { text-decoration: underline; }
 
 .upload-zone:hover, .upload-zone.drag-over {
   border-color: var(--color-primary);
-  background: rgba(99, 102, 241, 0.05);
+  background: rgba(79, 109, 122, 0.06);
 }
 
 .upload-zone .upload-icon { color: var(--text-muted); margin-bottom: 12px; }
@@ -584,7 +597,7 @@ a:hover { text-decoration: underline; }
   margin: -32px;
 }
 
-/* ── Sol Panel ── */
+/* ── Left Panel ── */
 .chat-sidebar {
   background: var(--bg-surface);
   border-right: 1px solid var(--border-subtle);
@@ -597,12 +610,12 @@ a:hover { text-decoration: underline; }
 .chat-new-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 12px;
-  background: linear-gradient(135deg, hsl(230, 75%, 55%), hsl(260, 70%, 55%));
+  background: linear-gradient(135deg, #4F6D7A, #3D5A66);
   color: white; border: none; border-radius: 12px;
   font-weight: 600; font-size: 0.9rem; cursor: pointer;
   transition: all 0.2s ease; margin-bottom: 16px;
 }
-.chat-new-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,0.3); }
+.chat-new-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,109,122,0.3); }
 
 .chat-student-picker { margin-bottom: 16px; }
 .chat-student-picker label {
@@ -628,7 +641,7 @@ a:hover { text-decoration: underline; }
   background: var(--color-accent); animation: pulse 2s infinite;
 }
 
-/* Konuşma geçmişi */
+/* Conversation history */
 .chat-history { flex: 1; overflow-y: auto; }
 .chat-history-title {
   display: flex; align-items: center; justify-content: space-between;
@@ -654,8 +667,8 @@ a:hover { text-decoration: underline; }
 }
 .chat-conv-item:hover { background: var(--bg-glass-hover); }
 .chat-conv-item.active {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.2);
+  background: rgba(79, 109, 122, 0.12);
+  border-color: rgba(79, 109, 122, 0.25);
 }
 .chat-conv-content { display: flex; align-items: flex-start; gap: 8px; flex: 1; min-width: 0; }
 .chat-conv-content svg { flex-shrink: 0; margin-top: 2px; color: var(--text-muted); }
@@ -672,9 +685,9 @@ a:hover { text-decoration: underline; }
   border-radius: 4px; transition: all 0.15s;
 }
 .chat-conv-item:hover .chat-conv-delete { opacity: 1; }
-.chat-conv-delete:hover { color: var(--color-danger); background: rgba(239,68,68,0.1); }
+.chat-conv-delete:hover { color: var(--color-danger); background: rgba(224,122,95,0.1); }
 
-/* ── Sağ Panel ── */
+/* ── Right Panel ── */
 .chat-main {
   display: flex; flex-direction: column;
   background: var(--bg-base);
@@ -686,7 +699,7 @@ a:hover { text-decoration: underline; }
   display: flex; flex-direction: column; gap: 20px;
 }
 
-/* Hoş geldin ekranı */
+/* Welcome screen */
 .chat-welcome {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -695,10 +708,10 @@ a:hover { text-decoration: underline; }
 }
 .chat-welcome-icon {
   width: 80px; height: 80px; border-radius: 20px;
-  background: linear-gradient(135deg, hsl(230,75%,55%), hsl(280,70%,55%));
+  background: linear-gradient(135deg, #4F6D7A, #6B9080);
   display: flex; align-items: center; justify-content: center;
   color: white; margin-bottom: 20px;
-  box-shadow: 0 8px 32px rgba(99,102,241,0.25);
+  box-shadow: 0 8px 32px rgba(79,109,122,0.25);
 }
 .chat-welcome h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
 .chat-welcome p { color: var(--text-secondary); font-size: 1rem; max-width: 400px; margin-bottom: 28px; }
@@ -718,7 +731,7 @@ a:hover { text-decoration: underline; }
   transform: translateX(4px);
 }
 
-/* Mesaj baloncukları */
+/* Message bubbles */
 .chat-bubble-row {
   display: flex; gap: 12px; animation: fadeInUp 0.3s ease;
   max-width: 85%;
@@ -732,11 +745,11 @@ a:hover { text-decoration: underline; }
   font-size: 0.8rem;
 }
 .chat-avatar.user {
-  background: linear-gradient(135deg, hsl(230,75%,55%), hsl(260,70%,55%));
+  background: linear-gradient(135deg, #4F6D7A, #3D5A66);
   color: white;
 }
 .chat-avatar.assistant {
-  background: linear-gradient(135deg, hsl(160,84%,40%), hsl(170,80%,40%));
+  background: linear-gradient(135deg, #6B9080, #81B29A);
   color: white;
 }
 
@@ -745,7 +758,7 @@ a:hover { text-decoration: underline; }
   font-size: 0.9rem; line-height: 1.7;
 }
 .chat-bubble.user {
-  background: linear-gradient(135deg, hsl(230,75%,55%), hsl(250,70%,55%));
+  background: linear-gradient(135deg, #4F6D7A, #3D5A66);
   color: white;
   border-bottom-right-radius: 6px;
 }
@@ -815,7 +828,7 @@ a:hover { text-decoration: underline; }
 .chat-input-context {
   font-size: 0.72rem; color: var(--color-accent);
   padding: 4px 10px; margin-bottom: 6px;
-  background: rgba(52,211,153,0.06);
+  background: rgba(107,144,128,0.08);
   border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;
 }
 .chat-input-row {
@@ -827,7 +840,7 @@ a:hover { text-decoration: underline; }
 }
 .chat-input-row:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  box-shadow: 0 0 0 3px rgba(79,109,122,0.12);
 }
 .chat-input {
   flex: 1; border: none; background: transparent;
@@ -838,12 +851,12 @@ a:hover { text-decoration: underline; }
 }
 .chat-send-btn {
   width: 40px; height: 40px; border-radius: 12px; border: none;
-  background: linear-gradient(135deg, hsl(230,75%,55%), hsl(260,70%,55%));
+  background: linear-gradient(135deg, #4F6D7A, #3D5A66);
   color: white; cursor: pointer; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.2s ease;
 }
-.chat-send-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+.chat-send-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 4px 12px rgba(79,109,122,0.3); }
 .chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* ── Offline Banner Animation ── */
