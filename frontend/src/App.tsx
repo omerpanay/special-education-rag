@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Layout/Sidebar';
+import ScrollToTop from './components/ScrollToTop';
 import { useBackendHealth } from './hooks/useBackendHealth';
 import { AlertTriangle, X } from 'lucide-react';
 import { useState } from 'react';
@@ -69,6 +70,7 @@ function AppLayout() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Routes>
           {/* Public */}
