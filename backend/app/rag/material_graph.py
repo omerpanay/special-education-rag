@@ -95,38 +95,39 @@ async def writer_node(state: MaterialState) -> dict[str, Any]:
     logger.info(f"writer_agent_basladi topic={state.get('interest_topic')}")
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """Sen özel eğitim alanında uzman bir çocuk hikayesi yazarısın.
-Verilen ilgi alanına göre basit, anlaşılır ve eğitici bir sosyal öykü yaz.
+        ("system", """You are an expert children's story writer specializing in special education.
+Write a simple, clear, and educational social story based on the given interest topic.
 
-KURALLAR:
-1. Dil basit ve net olsun (özel eğitim öğrencisi için)
-2. Her sahne 2-3 cümle olsun
-3. Hikaye pozitif ve destekleyici olsun
-4. Öğrencinin adını kullan
-5. Engel türüne uygun davranış modelleri göster
+RULES:
+1. Use simple, clear language (for a special education student)
+2. Each scene should be 2-3 sentences
+3. The story must be positive and supportive
+4. Use the student's name throughout the story
+5. Model appropriate behaviors relevant to the disability type
+6. Write ONLY in English — do NOT use any other language
 
-ÇIKTI FORMATI (Sadece JSON, başka bir şey yazma):
+OUTPUT FORMAT (Return only JSON, nothing else):
 {{
-  "title": "<Hikaye başlığı>",
+  "title": "<Story title>",
   "scenes": [
-    {{"order": 1, "text": "<Sahne 1 metni>"}},
-    {{"order": 2, "text": "<Sahne 2 metni>"}},
+    {{"order": 1, "text": "<Scene 1 text>"}},
+    {{"order": 2, "text": "<Scene 2 text>"}},
     ...
   ]
 }}"""),
-        ("human", """Öğrenci Adı: {student_name}
-İlgi Alanı: {interest_topic}
-Engel Türü: {disability_type}
-Sahne Sayısı: {scene_count}
+        ("human", """Student Name: {student_name}
+Interest Topic: {interest_topic}
+Disability Type: {disability_type}
+Number of Scenes: {scene_count}
 
-Lütfen bu bilgilere göre bir sosyal öykü yaz."""),
+Please write a social story based on this information."""),
     ])
 
     chain = prompt | _get_llm() | StrOutputParser()
     response = await chain.ainvoke({
-        "student_name": state.get("student_name", "Öğrenci"),
-        "interest_topic": state.get("interest_topic", "Doğa"),
-        "disability_type": state.get("disability_type", "Belirtilmedi"),
+        "student_name": state.get("student_name", "Student"),
+        "interest_topic": state.get("interest_topic", "Nature"),
+        "disability_type": state.get("disability_type", "Not specified"),
         "scene_count": state.get("scene_count", 3),
     })
 
@@ -138,13 +139,13 @@ Lütfen bu bilgilere göre bir sosyal öykü yaz."""),
         data = json.loads(clean)
         return {
             "scenes": data.get("scenes", []),
-            "title": data.get("title", f"{state.get('interest_topic', 'Hikaye')} Öyküsü"),
+            "title": data.get("title", f"{state.get('interest_topic', 'Story')} Adventure"),
         }
     except (json.JSONDecodeError, IndexError):
-        logger.warning(f"writer_json_parse_hatasi response={response[:200]}")
+        logger.warning(f"writer_json_parse_error response={response[:200]}")
         return {
             "scenes": [{"order": 1, "text": response[:500]}],
-            "title": f"{state.get('interest_topic', 'Hikaye')} Öyküsü",
+            "title": f"{state.get('interest_topic', 'Story')} Adventure",
         }
 
 
@@ -157,24 +158,23 @@ async def prompt_node(state: MaterialState) -> dict[str, Any]:
     logger.info(f"prompt_agent_basladi sahne_sayisi={len(state.get('scenes', []))}")
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """Sen bir görsel üretim prompt mühendisisin.
-Verilen sahne metinleri için çocuk-dostu, renkli, cartoon tarzı
-İNGİLİZCE görsel üretim promptları yaz.
+        ("system", """You are an image generation prompt engineer.
+Write child-friendly, colorful, cartoon-style image prompts for the given scene texts.
 
-KURALLAR:
-1. Prompt İngilizce olmalı (görsel üretim modelleri İngilizce çalışır)
-2. "cute cartoon style, colorful, child-friendly" her prompt'a ekle
-3. Korku, şiddet veya karanlık unsurlar KULLANMA
-4. Her prompt 1-2 cümle olsun
+RULES:
+1. Prompts MUST be in English (image generation models work in English)
+2. Add "cute cartoon style, colorful, child-friendly" to every prompt
+3. Do NOT include fear, violence, or dark elements
+4. Each prompt should be 1-2 sentences
 
-ÇIKTI FORMATI (Sadece JSON array, başka bir şey yazma):
+OUTPUT FORMAT (Return only a JSON array, nothing else):
 ["prompt 1", "prompt 2", ...]"""),
-        ("human", "Sahneler:\n{scenes_text}"),
+        ("human", "Scenes:\n{scenes_text}"),
     ])
 
     scenes = state.get("scenes", [])
     scenes_text = "\n".join(
-        f"Sahne {s.get('order', i+1)}: {s.get('text', '')}"
+        f"Scene {s.get('order', i+1)}: {s.get('text', '')}"
         for i, s in enumerate(scenes)
     )
 
@@ -257,7 +257,7 @@ async def pdf_node(state: MaterialState) -> dict[str, Any]:
 
     pdf_path = await build_social_story_pdf(
         material_id=state.get("material_id", str(uuid4())),
-        title=state.get("title", "Sosyal Öykü"),
+        title=state.get("title", "Social Story"),
         scenes=enriched_scenes,
         student_name=state.get("student_name", ""),
     )

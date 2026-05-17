@@ -6,6 +6,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { useBackendHealth } from './hooks/useBackendHealth';
 import { AlertTriangle, X } from 'lucide-react';
 import { useState } from 'react';
+import TopBar from './components/Layout/TopBar';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -17,6 +18,8 @@ import IEPGenerator from './pages/IEPGenerator';
 import StudentDashboard from './pages/StudentDashboard';
 import Observations from './pages/Observations';
 import Materials from './pages/Materials';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
 function OfflineBanner() {
@@ -59,9 +62,10 @@ function AppLayout() {
       <OfflineBanner />
       <div className="app-layout">
         <Sidebar />
-        <main className="main-content">
+        <div className="main-content">
+          <TopBar />
           <Outlet />
-        </main>
+        </div>
       </div>
     </>
   );
@@ -87,6 +91,8 @@ export default function App() {
             <Route path="/iep" element={<IEPGenerator />} />
             <Route path="/observations" element={<Observations />} />
             <Route path="/materials" element={<Materials />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
 
           {/* 404 catch-all */}

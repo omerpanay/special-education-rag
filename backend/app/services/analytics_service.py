@@ -1,10 +1,17 @@
-"""Analytics Service — Dashboard ve öğrenci gelişim verileri."""
+"""Analytics Service — Dashboard ve öğrenci gelişim verileri.
 
+Production-grade: Real conversation/IEP/observation counts per student.
+"""
+
+import logging
 from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.conversation import Conversation
+from app.models.iep_draft import IEPDraft
+from app.models.observation import Observation
 from app.models.student import Student
 from app.models.academic_source import AcademicSource
 from app.models.source_chunk import SourceChunk
@@ -15,6 +22,8 @@ from app.schemas.analytics import (
     StudentAnalyticsResponse,
     StudentSummary,
 )
+
+logger = logging.getLogger("sensei.analytics")
 
 
 class AnalyticsService:
@@ -32,11 +41,26 @@ class AnalyticsService:
         if not student:
             raise ValueError("Öğrenci bulunamadı")
 
+        # Real session count
+        sessions = (
+            await db.execute(
+                select(func.count()).where(
+                    Conversation.student_id == student_id,
+                    Conversation.teacher_id == teacher_id,
+                )
+            )
+        ).scalar() or 0
+
+        logger.info(
+            "student_analytics_fetched",
+            extra={"student_id": str(student_id), "sessions": sessions},
+        )
+
         return StudentAnalyticsResponse(
             student_id=student.id,
             student_name=student.name,
             disability_type=student.disability_type,
-            total_sessions=0,
+            total_sessions=sessions,
             overall_accuracy=0.0,
             trend="stable",
             time_series=[],
@@ -53,7 +77,16 @@ class AnalyticsService:
             )
         ).scalar() or 0
 
-        # Öğrenci özetleri
+        # Toplam konuşma (session) sayısı
+        total_sessions = (
+            await db.execute(
+                select(func.count()).where(
+                    Conversation.teacher_id == teacher_id
+                )
+            )
+        ).scalar() or 0
+
+        # Öğrenci özetleri — gerçek session/IEP/observation sayıları
         students = (
             await db.execute(
                 select(Student)
@@ -63,16 +96,43 @@ class AnalyticsService:
             )
         ).scalars().all()
 
-        summaries = [
-            StudentSummary(
-                id=s.id,
-                name=s.name,
-                disability_type=s.disability_type,
-                sessions_count=0,
-                accuracy_trend="stable",
+        summaries = []
+        for s in students:
+            # Öğrenciye ait konuşma sayısı
+            conv_count = (
+                await db.execute(
+                    select(func.count()).where(
+                        Conversation.student_id == s.id,
+                        Conversation.teacher_id == teacher_id,
+                    )
+                )
+            ).scalar() or 0
+
+            # IEP sayısı
+            iep_count = (
+                await db.execute(
+                    select(func.count()).where(IEPDraft.student_id == s.id)
+                )
+            ).scalar() or 0
+
+            # Observation sayısı
+            obs_count = (
+                await db.execute(
+                    select(func.count()).where(Observation.student_id == s.id)
+                )
+            ).scalar() or 0
+
+            summaries.append(
+                StudentSummary(
+                    id=s.id,
+                    name=s.name,
+                    disability_type=s.disability_type,
+                    sessions_count=conv_count,
+                    iep_count=iep_count,
+                    observation_count=obs_count,
+                    accuracy_trend="stable",
+                )
             )
-            for s in students
-        ]
 
         # Kaynak istatistikleri
         total_sources = (
@@ -89,9 +149,19 @@ class AnalyticsService:
             )
         ).scalar() or 0
 
+        logger.info(
+            "dashboard_fetched",
+            extra={
+                "teacher_id": str(teacher_id),
+                "students": student_count,
+                "sessions": total_sessions,
+                "queries": total_queries,
+            },
+        )
+
         return DashboardResponse(
             total_students=student_count,
-            total_sessions=0,
+            total_sessions=total_sessions,
             avg_accuracy_all=0.0,
             students_summary=summaries,
             source_stats=SourceStats(

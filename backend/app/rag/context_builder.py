@@ -70,34 +70,34 @@ class ContextBuilder:
         # Bu öğrenci bağlamında verilen yanıtlara gelen feedback'ler
         feedback_stats = await _get_feedback_stats(db, student_id, teacher_id)
 
-        # ── 4. Engel türü etiketlerini Türkçeye çevir ──
+        # ── 4. Disability type labels (English) ──
         disability_labels = {
-            "disleksi": "Özel Öğrenme Güçlüğü (Disleksi)",
-            "otizm": "Otizm Spektrum Bozukluğu",
-            "zihin_yetersizligi": "Zihinsel Yetersizlik",
-            "isitme": "İşitme Yetersizliği",
-            "bedensel": "Bedensel Yetersizlik",
-            "dehb": "Dikkat Eksikliği ve Hiperaktivite Bozukluğu",
+            "disleksi": "Specific Learning Disability (Dyslexia)",
+            "otizm": "Autism Spectrum Disorder",
+            "zihin_yetersizligi": "Intellectual Disability",
+            "isitme": "Hearing Impairment",
+            "bedensel": "Physical Disability",
+            "dehb": "Attention Deficit Hyperactivity Disorder (ADHD)",
         }
         disability_label = disability_labels.get(
             student.disability_type, student.disability_type
         )
 
-        # ── 5. Bağlam metnini formatla ──
+        # ── 5. Format context string (English) ──
         context_lines = [
-            f"Öğrenci Adı: {student.name}",
-            f"Eğitsel Tanı: {disability_label}",
-            f"Sınıf Seviyesi: {student.grade_level}. Sınıf",
+            f"Student Name: {student.name}",
+            f"Educational Diagnosis: {disability_label}",
+            f"Grade Level: Grade {student.grade_level}",
         ]
 
         if student.competency_notes:
             context_lines.append(
-                f"Öğretmen Yetkinlik Notları: {student.competency_notes}"
+                f"Teacher Competency Notes: {student.competency_notes}"
             )
 
         if total_queries > 0:
             context_lines.append(
-                f"Bu öğrenci için daha önce {total_queries} sorgu yapılmış."
+                f"Previous queries for this student: {total_queries}"
             )
 
         if feedback_stats["total"] > 0:
@@ -105,8 +105,8 @@ class ContextBuilder:
                 feedback_stats["helpful"] / feedback_stats["total"] * 100
             )
             context_lines.append(
-                f"Yanıt memnuniyet oranı: %{helpful_pct:.0f} "
-                f"({feedback_stats['helpful']}/{feedback_stats['total']} faydalı)"
+                f"Response satisfaction rate: {helpful_pct:.0f}% "
+                f"({feedback_stats['helpful']}/{feedback_stats['total']} helpful)"
             )
 
         return "\n".join(context_lines)

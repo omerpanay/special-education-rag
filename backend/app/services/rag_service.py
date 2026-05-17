@@ -1,12 +1,11 @@
-"""RAG Core Servisi — Soru Cevaplama Orkesträtörü (Adaptive RAG).
+"""RAG Core Service — Question-Answering Orchestrator (Adaptive RAG).
 
-─── MİMARİ KARAR: Bu servis neden en karmaşık? ───
-Çünkü 5 farklı sistemi koordine eder:
-1. Retrieval: Veritabanında hibrit arama yap
-2. Adaptive Router: Yerel yeterli mi? Web gerekli mi? Karar ver
-3. Context Building: Öğrenci profili + konuşma geçmişi + web sonuçları
-4. Generation: Birleşik bağlamı LLM'e gönder, yanıt al
-5. Observability: Her adımın süresini ölç ve kaydet
+Coordinates 5 systems:
+1. Retrieval: Hybrid search in the vector database
+2. Adaptive Router: Is local sufficient? Web needed?
+3. Context Building: Student profile + conversation history + web results
+4. Generation: Send unified context to LLM, generate response
+5. Observability: Measure latency at each step
 """
 
 import logging
@@ -36,7 +35,7 @@ logger = logging.getLogger("edurag.rag")
 
 
 class RagService:
-    """RAG soru-cevap iş mantığı."""
+    """RAG question-answering business logic."""
 
     @staticmethod
     async def ask_question(
@@ -45,16 +44,16 @@ class RagService:
         teacher_id: UUID,
         conversation_id: Optional[UUID] = None,
     ) -> QueryResponse:
-        """Kullanıcının sorusuna Adaptive RAG ile cevap üret.
+        """Generate an answer using Adaptive RAG.
 
-        Akış (Adaptive RAG):
-        1. Yerel hibrit arama → En alakalı 5 chunk bul
-        2. Adaptive Router → Yerel yeterli mi? Web gerekli mi?
-        3. Web arama (gerekirse) → Tavily ile online kaynak bul
-        4. Birleşik bağlam oluştur (yerel + web + öğrenci + geçmiş)
-        5. LCEL zinciri ile LLM'e sor
-        6. Etkileşimi DB'ye kaydet (observability)
-        7. Yanıtı döndür
+        Flow:
+        1. Local hybrid search → Find top 5 relevant chunks
+        2. Adaptive Router → Is local sufficient? Web needed?
+        3. Web search (if needed) → Tavily online sources
+        4. Build unified context (local + web + student + history)
+        5. LCEL chain → Ask LLM
+        6. Persist interaction to DB (observability)
+        7. Return response
         """
         t0 = time.time()
 
@@ -91,26 +90,27 @@ class RagService:
             web_context = format_web_results_as_context(web_results)
 
         # ── 3. CONTEXT FORMATTING ──
-        # Yerel chunk'ları LLM'in okuyacağı formata çevir
+        # Build a clear block for each chunk so the LLM can cite it
         context_parts = []
         for rank, (chunk, score) in enumerate(chunks_with_scores, 1):
-            source_title = chunk.source.title if chunk.source else "Bilinmeyen"
+            source_title = chunk.source.title if chunk.source else "Unknown Source"
             page = chunk.page_numbers[0] if chunk.page_numbers else 0
             context_parts.append(
-                f"--- BAĞLAM {rank} (Kaynak: {source_title}, Sayfa: {page}) ---\n"
+                f"[ACADEMIC SOURCE {rank}] "
+                f"Source: {source_title} | Page: {page}\n"
                 f"{chunk.content}\n"
             )
 
         formatted_context = (
             "\n".join(context_parts) if context_parts
-            else "Hiçbir yerel akademik kaynak bulunamadı."
+            else "No relevant content found in local academic sources."
         )
 
-        # Web sonuçlarını bağlama ekle
+        # Web sonuçlarını bağlama ekle — net [WEB] etiketi ile
         if web_context:
             formatted_context += "\n\n" + web_context
 
-        # ── 3.5 ADAPTIVE CONTEXT (Kişiselleştirme) ──
+        # ── 3.5 ADAPTIVE CONTEXT (Personalization) ──
         student_context = ""
         if request.student_id:
             student_context = await ContextBuilder.build_student_context(
@@ -120,7 +120,7 @@ class RagService:
             )
             if student_context:
                 student_context = (
-                    "\nÖğrenci Profil Bağlamı:\n"
+                    "\nStudent Profile Context:\n"
                     + student_context
                 )
 
@@ -131,44 +131,52 @@ class RagService:
             conversation = await _get_conversation(db, conversation_id, teacher_id)
             if conversation and conversation.messages:
                 history_parts = []
-                recent = conversation.messages[-10:]  # Son 5 çift (user+assistant)
+                recent = conversation.messages[-10:]  # Last 5 pairs (user+assistant)
                 for msg in recent:
-                    role_label = "Öğretmen" if msg.role == "user" else "Asistan"
+                    role_label = "Teacher" if msg.role == "user" else "Assistant"
                     history_parts.append(f"{role_label}: {msg.content}")
                 if history_parts:
                     conversation_context = (
-                        "\n### KONUŞMA GEÇMİŞİ ###\n"
+                        "\n### CONVERSATION HISTORY ###\n"
                         + "\n".join(history_parts)
-                        + "\n### GEÇMİŞ BİTİŞİ ###\n"
+                        + "\n### HISTORY END ###\n"
                     )
 
         # ── 4. GENERATION ──
-        # Hem yerel hem web sonuç yoksa → fallback
+        # If no local or web results → fallback
         has_any_context = bool(chunks_with_scores) or bool(web_results)
 
         if not has_any_context:
             answer = (
-                "Üzgünüm, ne yerel akademik kaynaklarda ne de web'de "
-                "bu sorunun cevabı bulunmamaktadır."
+                "No sufficient information was found on this topic in either local "
+                "academic sources or current web results. I recommend consulting "
+                "MEB's Special Education Directorate or a relevant specialist."
             )
         else:
+            # Notify LLM if web search was performed
+            web_hint = ""
+            if route_decision.route in (RouteType.WEB, RouteType.HYBRID) and web_results:
+                web_hint = (
+                    "\n[NOTE: Tavily web search was also performed for this query. "
+                    "Mark information from web sources using the [Web: <title>] format.]\n"
+                )
             chain = create_rag_chain()
             answer = await chain.ainvoke({
                 "context": formatted_context,
                 "question": request.query,
-                "disability_type": request.disability_type or "Belirtilmedi",
+                "disability_type": request.disability_type or "Not specified",
                 "grade_level": (
                     str(request.grade_level) if request.grade_level
-                    else "Belirtilmedi"
+                    else "Not specified"
                 ),
-                "student_context": student_context + conversation_context,
+                "student_context": student_context + conversation_context + web_hint,
             })
 
         t2 = time.time()
         llm_latency = (t2 - t1) * 1000
         total_latency = (t2 - t0) * 1000
 
-        is_fallback = "bulunmamaktadır" in answer.lower() or not has_any_context
+        is_fallback = "no sufficient" in answer.lower() or not has_any_context
 
         # ── 4. PERSIST (DB'YE KAYDET) ──
         rag_response = RagResponse(
@@ -220,19 +228,31 @@ class RagService:
 
         # ── 6. CONVERSATION PERSISTENCE ──
         response_uuid = UUID(str(rag_response.id))
-        if conversation_id and conversation:
-            db.add(ConversationMessage(
-                conversation_id=conversation.id,
-                role="user",
-                content=request.query,
-            ))
-            db.add(ConversationMessage(
-                conversation_id=conversation.id,
-                role="assistant",
-                content=answer,
-                rag_response_id=str(response_uuid),
-            ))
-            await db.commit()
+
+        # Auto-create conversation if none provided (first message)
+        if not conversation:
+            title = request.query[:80] if len(request.query) > 0 else "New Conversation"
+            conversation = Conversation(
+                teacher_id=teacher_id,
+                student_id=request.student_id,
+                title=title,
+            )
+            db.add(conversation)
+            await db.flush()  # Get conversation.id
+
+        # Always save user + assistant messages to conversation
+        db.add(ConversationMessage(
+            conversation_id=conversation.id,
+            role="user",
+            content=request.query,
+        ))
+        db.add(ConversationMessage(
+            conversation_id=conversation.id,
+            role="assistant",
+            content=answer,
+            rag_response_id=str(response_uuid),
+        ))
+        await db.commit()
 
         # ── 7. RETURN ──
         return QueryResponse(

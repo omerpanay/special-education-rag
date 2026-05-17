@@ -155,9 +155,12 @@ export async function askQuestion(data: QueryRequest): Promise<QueryResponse> {
   });
 }
 
+
 // Sources
 export async function getSources(skip = 0, limit = 50): Promise<SourceListResponse> {
-  return request<SourceListResponse>(`/sources?skip=${skip}&limit=${limit}`);
+  const data = await request<{ total: number; items: any[] }>(`/sources?skip=${skip}&limit=${limit}`);
+  // Backend returns `items`, frontend types expect `sources`
+  return { total: data.total, sources: data.items } as SourceListResponse;
 }
 
 export async function uploadSource(

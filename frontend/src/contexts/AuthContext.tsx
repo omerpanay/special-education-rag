@@ -81,7 +81,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiLogin(data);
       setState({ isAuthenticated: true, isLoading: false, error: null });
     } catch (err) {
-      const message = err instanceof ApiError ? err.detail : 'Login failed';
+      let message = 'Login failed';
+      if (err instanceof ApiError) {
+        message = Array.isArray(err.detail) ? err.detail[0]?.msg : (typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail));
+      }
       setState({ isAuthenticated: false, isLoading: false, error: message });
       throw err;
     }
@@ -93,7 +96,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRegister(data);
       setState(prev => ({ ...prev, isLoading: false, error: null }));
     } catch (err) {
-      const message = err instanceof ApiError ? err.detail : 'Registration failed';
+      let message = 'Registration failed';
+      if (err instanceof ApiError) {
+        message = Array.isArray(err.detail) ? err.detail[0]?.msg : (typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail));
+      }
       setState(prev => ({ ...prev, isLoading: false, error: message }));
       throw err;
     }

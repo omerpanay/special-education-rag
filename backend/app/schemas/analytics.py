@@ -28,6 +28,8 @@ class StudentSummary(BaseModel):
     name: str
     disability_type: str
     sessions_count: int = 0
+    iep_count: int = 0
+    observation_count: int = 0
     accuracy_trend: str = "stable"
 
 

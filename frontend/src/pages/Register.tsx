@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { GraduationCap, Mail, Lock, User } from 'lucide-react';
+import { GraduationCap, Mail, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function Register() {
   const [fullName, setFullName] = useState('');
@@ -22,52 +22,112 @@ export default function Register() {
 
   if (success) {
     return (
-      <div className="auth-container">
-        <div className="auth-card" style={{ textAlign: 'center' }}>
+      <div className="auth-layout">
+        <main className="auth-card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎉</div>
-          <h2>Registration Successful!</h2>
-          <p className="auth-subtitle">Redirecting to login page...</p>
-        </div>
+          <h2 className="font-headline-md">Registration Successful!</h2>
+          <p className="font-body-md" style={{ color: 'var(--text-secondary)' }}>Redirecting to login page...</p>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div style={{ textAlign: 'center', marginBottom: 8 }}>
-          <GraduationCap size={40} color="var(--color-primary-light)" />
+    <div className="auth-layout">
+      <main className="auth-card">
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <img 
+            src="/sensei-logo.png" 
+            alt="SENSEI Logo" 
+            style={{ width: '64px', height: '64px', objectFit: 'contain', marginBottom: '16px', borderRadius: '16px' }} 
+          />
+          <h1 className="font-headline-lg">Create Account</h1>
+          <p className="font-body-md" style={{ color: 'var(--text-secondary)' }}>
+            Register to access SENSEI platform
+          </p>
         </div>
-        <h2>Create Account</h2>
-        <p className="auth-subtitle">Register to access EduRAG platform</p>
 
-        {error && <div className="alert-error">{error}</div>}
+        {error && (
+          <div style={{ 
+            padding: '12px', background: '#FDE8E8', color: 'var(--color-danger)', 
+            borderRadius: '8px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px',
+            fontSize: '13px', fontWeight: 500
+          }}>
+            <AlertCircle size={16} /> {error}
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="fullName"><User size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Full Name</label>
-            <input id="fullName" type="text" className="form-input" placeholder="Jane Smith"
-              value={fullName} onChange={e => { setFullName(e.target.value); clearError(); }} required />
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div>
+            <label className="form-label">Full Name</label>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}>
+                <User size={18} />
+              </span>
+              <input 
+                type="text" 
+                className="form-input" 
+                style={{ paddingLeft: '44px' }} 
+                placeholder="Jane Smith" 
+                required 
+                value={fullName}
+                onChange={e => { setFullName(e.target.value); clearError(); }}
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="regEmail"><Mail size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Email</label>
-            <input id="regEmail" type="email" className="form-input" placeholder="teacher@school.edu"
-              value={email} onChange={e => { setEmail(e.target.value); clearError(); }} required />
+
+          <div>
+            <label className="form-label">Email</label>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}>
+                <Mail size={18} />
+              </span>
+              <input 
+                type="email" 
+                className="form-input" 
+                style={{ paddingLeft: '44px' }} 
+                placeholder="Enter your email" 
+                required 
+                value={email}
+                onChange={e => { setEmail(e.target.value); clearError(); }}
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="regPassword"><Lock size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />Password</label>
-            <input id="regPassword" type="password" className="form-input" placeholder="At least 6 characters"
-              value={password} onChange={e => { setPassword(e.target.value); clearError(); }} required minLength={6} />
+
+          <div>
+            <label className="form-label">Password</label>
+            <div style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }}>
+                <Lock size={18} />
+              </span>
+              <input 
+                type="password" 
+                className="form-input" 
+                style={{ paddingLeft: '44px' }} 
+                placeholder="••••••••" 
+                required 
+                minLength={6}
+                value={password}
+                onChange={e => { setPassword(e.target.value); clearError(); }}
+              />
+            </div>
           </div>
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Register'}
+
+          <button type="submit" className="btn-primary" style={{ marginTop: '8px' }} disabled={isLoading}>
+            {isLoading ? 'Creating account...' : 'Register'} <ArrowRight size={18} />
           </button>
         </form>
 
-        <div className="auth-footer">
-          Already have an account? <Link to="/login">Sign In</Link>
-        </div>
-      </div>
+        {/* Footer */}
+        <p className="font-body-md" style={{ textAlign: 'center', marginTop: '32px', color: 'var(--text-secondary)' }}>
+          Already have an account?{' '}
+          <Link to="/login" className="font-label-md" style={{ color: 'var(--color-primary)', marginLeft: '4px' }}>
+            Sign in
+          </Link>
+        </p>
+      </main>
     </div>
   );
 }

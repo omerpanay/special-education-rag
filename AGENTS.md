@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/001-edurag-platform/plan.md
+at specs/002-deploy-pipeline/plan.md
 <!-- SPECKIT END -->

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Knowledge Base - ScholarDoc</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ffb59d",
+                        "on-background": "#261814",
+                        "on-secondary-fixed": "#251a00",
+                        "on-tertiary-fixed-variant": "#004e60",
+                        "accent-peach": "#FFF1E6",
+                        "tertiary-container": "#00a7cb",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#f7ddd5",
+                        "text-primary": "#2D3142",
+                        "surface-variant": "#f7ddd5",
+                        "surface-container-low": "#fff1ed",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#261814",
+                        "surface-tint": "#ab3500",
+                        "secondary-fixed": "#ffdf96",
+                        "on-error": "#ffffff",
+                        "background": "#fff8f6",
+                        "surface-container-high": "#fde3db",
+                        "on-primary-fixed": "#390c00",
+                        "outline": "#8d7168",
+                        "secondary-container": "#ffd97d",
+                        "on-secondary-fixed-variant": "#594400",
+                        "inverse-on-surface": "#ffede8",
+                        "text-secondary": "#4F5D75",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#ffb59d",
+                        "on-primary-container": "#5f1900",
+                        "tertiary": "#00677e",
+                        "surface-bright": "#fff8f6",
+                        "inverse-surface": "#3c2d28",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#b5ebff",
+                        "outline-variant": "#e1bfb5",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#003744",
+                        "primary": "#ab3500",
+                        "on-primary-fixed-variant": "#832600",
+                        "on-secondary-container": "#785d09",
+                        "primary-fixed": "#ffdbd0",
+                        "surface-dim": "#eed5cd",
+                        "surface": "#fff8f6",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#ff6b35",
+                        "error": "#ba1a1a",
+                        "border-subtle": "#E9ECEF",
+                        "surface-container": "#ffe9e3",
+                        "on-tertiary-fixed": "#001f28",
+                        "surface-main": "#FFFFFF",
+                        "tertiary-fixed-dim": "#59d5fb",
+                        "on-surface-variant": "#594139",
+                        "secondary": "#765b06",
+                        "secondary-fixed-dim": "#e7c269",
+                        "surface-alt": "#F8F9FA"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "container-max": "1280px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "headline-lg": ["Outfit"],
+                        "headline-md": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-main text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full py-gutter px-4 bg-surface-alt border-r border-outline-variant w-64 z-40">
+<div class="mb-8 px-2 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome_mosaic</span>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary m-0 p-0 leading-none">ScholarDoc</h1>
+</div>
+</div>
+<div class="mb-8 px-2 flex items-center gap-3 bg-surface-main p-3 rounded-xl border border-border-subtle shadow-sm">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRIiWzLXTiC5G3eZxp2FGDftf4kKvl4BFbpZ3AswxLgMSdb5of6ZgSZaSuFYEOOjN86a9NwuHekIBPclr8sVMNeSdGsb6WchELknGWbGoIU4cqJvTLhZcjve9TvJGbJ6FbatoO1vAjebZ7KujLCJkeGYBVeDeJiYFYbDKUT65iZSSQxCeZ4jeTibjwYasD8d5cWDaq1_hZP1rmSmx5NvwOmY_jtuLNgN1Rc1in_eq8znsQavN6F6umoWwcVI9AGlt9KTOsuGk2IjGc"/>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-text-primary truncate">Academic Manager</p>
+<p class="font-body-md text-xs text-text-secondary truncate">Senior Researcher</p>
+</div>
+</div>
+<button class="w-full mb-8 bg-primary-container text-on-primary-container font-label-md text-label-md py-3 px-4 rounded-full flex items-center justify-center gap-2 hover:bg-primary hover:text-on-primary transition-colors duration-200">
+<span class="material-symbols-outlined text-lg">cloud_upload</span>
+            Upload Source
+        </button>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-accent-peach text-primary border-l-4 border-primary rounded-r-lg transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-md text-label-md">Knowledge Base</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">science</span>
+<span class="font-label-md text-label-md">RAG Playground</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 scale-98 active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Mobile Only for Navigation, acts as app bar on desktop) -->
+<header class="sticky top-0 w-full z-30 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 max-w-container-max mx-auto bg-surface-main border-b border-border-subtle">
+<div class="flex items-center gap-4 lg:hidden">
+<button class="text-text-primary p-1">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md text-primary">ScholarDoc</span>
+</div>
+<div class="hidden lg:flex flex-1 items-center bg-surface-alt border border-border-subtle rounded-full px-4 py-2 max-w-md mx-4">
+<span class="material-symbols-outlined text-text-secondary mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full p-0 text-text-primary placeholder-text-secondary" placeholder="Search knowledge base..." type="text"/>
+</div>
+<div class="flex items-center gap-4 ml-auto lg:ml-0">
+<button class="text-text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-alt">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="lg:hidden text-text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-alt">
+<img alt="User" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfFZUvTuVJuZo5C1vYMN0teotdbUH43EuvLIrkBmo7vZp3HWCoEDTy5Y5nOZG5VntL5igEr_0jChgTg07Ijrr5jYBgx52Qiva_RXmPm0t-buUrN7CoQay7-GpZ6IdiZa588xuGACLX53FedC5PnZPe-yxtBST-Bub0BVqRsXTyPSL9Iv0kUxhA5q6jpy9nTdyGW2qPNAf3YTeJqZ4WMIT3UEt3ulAUyc4SnbdY4cDTYIX1NBpdKpNHGv8YKc0l7BPGYhJ_65VNUGLc"/>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-margin-mobile md:p-gutter lg:p-margin-desktop max-w-container-max mx-auto w-full">
+<!-- Header Section -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-text-primary mb-1">Knowledge Base</h2>
+<p class="font-body-md text-text-secondary">Manage and organize your academic sources and collections.</p>
+</div>
+<button class="bg-surface-main border border-border-subtle text-text-primary font-label-md text-label-md py-2 px-5 rounded-full flex items-center gap-2 hover:bg-surface-alt transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">create_new_folder</span>
+                    New Collection
+                </button>
+</div>
+<!-- Upload Zone -->
+<div class="mb-12 bg-surface-alt border-2 border-dashed border-outline-variant rounded-xl p-12 flex flex-col items-center justify-center text-center transition-colors hover:bg-accent-peach hover:border-primary-fixed-dim cursor-pointer group">
+<div class="w-16 h-16 bg-surface-main rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl">upload_file</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-text-primary mb-2">Drag and drop your files here</h3>
+<p class="font-body-md text-text-secondary mb-6">or click to browse (PDF, TXT, DOCX)</p>
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md py-3 px-8 rounded-full hover:bg-primary hover:text-on-primary transition-colors shadow-sm">
+                    Upload Files
+                </button>
+</div>
+<!-- Recent Uploads Section -->
+<div>
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline-md text-headline-md text-text-primary">Recent Uploads</h3>
+<button class="text-text-secondary hover:text-primary font-label-md text-label-md flex items-center gap-1 transition-colors">
+                        View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="bg-surface-main border border-border-subtle rounded-xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-alt border-b border-border-subtle">
+<th class="py-4 px-6 font-label-md text-label-md text-text-secondary font-semibold">Document Name</th>
+<th class="py-4 px-6 font-label-md text-label-md text-text-secondary font-semibold">Size</th>
+<th class="py-4 px-6 font-label-md text-label-md text-text-secondary font-semibold">Upload Date</th>
+<th class="py-4 px-6 font-label-md text-label-md text-text-secondary font-semibold">Status</th>
+<th class="py-4 px-6 font-label-md text-label-md text-text-secondary font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-text-primary divide-y divide-border-subtle">
+<tr class="hover:bg-surface-alt transition-colors">
+<td class="py-4 px-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary">description</span>
+<span class="font-medium">Quantum_Computing_Review_2023.pdf</span>
+</td>
+<td class="py-4 px-6 text-text-secondary">2.4 MB</td>
+<td class="py-4 px-6 text-text-secondary">Oct 24, 2023</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant">
+                                            Indexed
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-text-secondary hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-alt transition-colors">
+<td class="py-4 px-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary">description</span>
+<span class="font-medium">Neural_Networks_Dataset_V2.txt</span>
+</td>
+<td class="py-4 px-6 text-text-secondary">850 KB</td>
+<td class="py-4 px-6 text-text-secondary">Oct 23, 2023</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-accent-peach text-primary-container border border-primary-fixed-dim">
+                                            Processing
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-text-secondary hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-alt transition-colors">
+<td class="py-4 px-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary">description</span>
+<span class="font-medium">Literature_Analysis_Draft.docx</span>
+</td>
+<td class="py-4 px-6 text-text-secondary">1.2 MB</td>
+<td class="py-4 px-6 text-text-secondary">Oct 20, 2023</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-error-container text-on-error-container border border-error-container">
+                                            Failed
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-text-secondary hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-alt transition-colors">
+<td class="py-4 px-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-text-secondary">description</span>
+<span class="font-medium">Research_Methodology_Notes.pdf</span>
+</td>
+<td class="py-4 px-6 text-text-secondary">5.7 MB</td>
+<td class="py-4 px-6 text-text-secondary">Oct 18, 2023</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant">
+                                            Indexed
+                                        </span>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-text-secondary hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-gutter px-margin-desktop flex flex-col md:flex-row justify-between items-center max-w-container-max mx-auto bg-surface-container-lowest border-t border-border-subtle mt-auto">
+<div class="mb-4 md:mb-0">
+<span class="font-display-lg text-label-md text-on-surface-variant">© 2024 ScholarDoc Academic Systems</span>
+</div>
+<div class="flex gap-6">
+<a class="font-body-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-100 hover:opacity-80" href="#">Privacy Policy</a>
+<a class="font-body-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-100 hover:opacity-80" href="#">Terms of Service</a>
+<a class="font-body-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-100 hover:opacity-80" href="#">Documentation</a>
+<a class="font-body-md text-label-md text-on-surface-variant hover:text-primary transition-colors opacity-100 hover:opacity-80" href="#">Support</a>
+</div>
+</footer>
+</div>
+</body></html>

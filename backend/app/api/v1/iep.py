@@ -73,7 +73,15 @@ async def generate_iep(
         teacher_id=current_teacher.id,
         request=request,
     )
-    return _draft_to_response(draft)
+    # Fetch student name for response
+    from app.models.student import Student
+    from sqlalchemy import select as sa_select
+    student_res = await db.execute(
+        sa_select(Student).where(Student.id == request.student_id)
+    )
+    student = student_res.scalar_one_or_none()
+    student_name = student.name if student else ""
+    return _draft_to_response(draft, student_name)
 
 
 @router.get("/student/{student_id}", response_model=IEPListResponse)
@@ -83,12 +91,21 @@ async def list_student_ieps(
     current_teacher: Teacher = Depends(get_current_teacher),
 ) -> IEPListResponse:
     """Öğrencinin tüm BEP taslaklarını listele."""
+    from app.models.student import Student
+    from sqlalchemy import select as sa_select
+    # Fetch student name for response
+    student_res = await db.execute(
+        sa_select(Student).where(Student.id == student_id, Student.teacher_id == current_teacher.id)
+    )
+    student = student_res.scalar_one_or_none()
+    student_name = student.name if student else ""
+
     drafts = await IEPService.list_by_student(
         db=db,
         student_id=student_id,
         teacher_id=current_teacher.id,
     )
-    items = [_draft_to_response(d) for d in drafts]
+    items = [_draft_to_response(d, student_name) for d in drafts]
     return IEPListResponse(items=items, total=len(items))
 
 

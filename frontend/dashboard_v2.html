@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduPlanner - Special Education Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#390c00",
+                        "on-error": "#ffffff",
+                        "primary-container": "#ff6b35",
+                        "text-secondary": "#4F5D75",
+                        "tertiary-fixed-dim": "#59d5fb",
+                        "on-primary-fixed-variant": "#832600",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#fde3db",
+                        "outline-variant": "#e1bfb5",
+                        "secondary-container": "#ffd97d",
+                        "inverse-primary": "#ffb59d",
+                        "surface-bright": "#fff8f6",
+                        "secondary": "#765b06",
+                        "inverse-on-surface": "#ffede8",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#b5ebff",
+                        "tertiary": "#00677e",
+                        "on-tertiary-fixed-variant": "#004e60",
+                        "surface-container": "#ffe9e3",
+                        "primary-fixed": "#ffdbd0",
+                        "on-primary-container": "#5f1900",
+                        "error-container": "#ffdad6",
+                        "background": "#fff8f6",
+                        "surface-container-highest": "#f7ddd5",
+                        "on-secondary-container": "#785d09",
+                        "surface-alt": "#F8F9FA",
+                        "on-surface-variant": "#594139",
+                        "primary-fixed-dim": "#ffb59d",
+                        "surface-variant": "#f7ddd5",
+                        "text-primary": "#2D3142",
+                        "accent-peach": "#FFF1E6",
+                        "secondary-fixed": "#ffdf96",
+                        "surface-tint": "#ab3500",
+                        "secondary-fixed-dim": "#e7c269",
+                        "primary": "#ab3500",
+                        "on-tertiary-fixed": "#001f28",
+                        "inverse-surface": "#3c2d28",
+                        "outline": "#8d7168",
+                        "border-subtle": "#E9ECEF",
+                        "surface-container-low": "#fff1ed",
+                        "on-secondary-fixed-variant": "#594400",
+                        "on-surface": "#261814",
+                        "on-background": "#261814",
+                        "on-secondary-fixed": "#251a00",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#00a7cb",
+                        "surface": "#fff8f6",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-main": "#FFFFFF",
+                        "on-tertiary-container": "#003744",
+                        "surface-dim": "#eed5cd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "margin-desktop": "40px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Outfit"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Outfit"],
+                        "headline-lg": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-alt font-body-md text-body-md text-text-primary h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-64 border-r border-border-subtle bg-surface-alt flex flex-col py-spacing-gutter z-50">
+<div class="px-margin-mobile mb-8">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">EduPlanner</h1>
+<p class="font-label-md text-label-md text-text-secondary mt-1">Special Education</p>
+</div>
+<div class="flex-1 flex flex-col gap-2 px-3">
+<a class="flex items-center gap-3 text-text-secondary hover:text-primary px-4 py-3 transition-colors rounded-lg hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 bg-accent-peach text-primary font-bold rounded-lg border-l-4 border-primary px-4 py-3 scale-[0.99] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md text-label-md">Students</span>
+</a>
+<a class="flex items-center gap-3 text-text-secondary hover:text-primary px-4 py-3 transition-colors rounded-lg hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">IEPs</span>
+</a>
+<a class="flex items-center gap-3 text-text-secondary hover:text-primary px-4 py-3 transition-colors rounded-lg hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-label-md text-label-md">Chat</span>
+</a>
+<a class="flex items-center gap-3 text-text-secondary hover:text-primary px-4 py-3 transition-colors rounded-lg hover:bg-surface-container" href="#">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+<span class="font-label-md text-label-md">Materials</span>
+</a>
+</div>
+<div class="px-margin-mobile mt-auto">
+<button class="w-full bg-primary-container text-on-error font-label-md text-label-md py-3 rounded-full hover:bg-surface-tint transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New IEP
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col h-full bg-surface-alt relative">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 w-full border-b border-border-subtle bg-surface flex items-center justify-between px-margin-desktop h-20">
+<div class="flex-1 flex items-center">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-alt border border-border-subtle rounded-xl focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-text-primary placeholder:text-text-secondary outline-none transition-all" placeholder="Search students, goals..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="text-text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-px bg-border-subtle mx-2"></div>
+<img alt="Educator Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-alt" data-alt="A professional headshot of a female educator smiling warmly in a bright, modern classroom setting. The lighting is soft and natural, creating an inviting and trustworthy mood. The image is framed as a circular avatar against a clean, light background, reflecting a modern, optimistic corporate educational aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD77QMIgYsqZfyC40vmZjFC-Y05NQ-iyRJ_oVaGSw1ZwVj4h6rn_KYEWd4c0WzKxXAsBLs4f5eM1cUdnoziLqdNi8l0kCuR4ZsqPymYzl2UO-pnay7eha_qvLfCd6NtUgL76AbCVvU2olU6NOxtm4zWkJgpTUmhIieYixcI99xdnJ3a7DQEUNi1gbfBrnMyCuYXbTggMpOJsGwOrwXwx1j41EHI3LGy0hMAgRNv91T8VY_ood08ggTuWMylha6N0dRGtQGWfGYovsxn"/>
+</div>
+</header>
+<!-- 3-Panel Grid -->
+<div class="flex-1 flex gap-gutter p-gutter overflow-hidden h-[calc(100vh-5rem)]">
+<!-- Panel A: Student Directory (25%) -->
+<section class="w-1/4 bg-surface-main rounded-xl border border-border-subtle flex flex-col overflow-hidden flex-shrink-0">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-alt/50">
+<h2 class="font-headline-md text-[18px] font-semibold text-text-primary">My Caseload</h2>
+<span class="bg-surface-container text-primary font-label-md text-[12px] px-2 py-1 rounded-full">12 Students</span>
+</div>
+<div class="flex-1 overflow-y-auto p-2">
+<!-- Student Card Active -->
+<div class="p-3 mb-2 bg-accent-peach rounded-lg border border-primary/20 flex gap-3 cursor-pointer">
+<img alt="Student Avatar" class="w-10 h-10 rounded-full object-cover" data-alt="A portrait of a young male student looking thoughtfully at a tablet in a bright, well-lit classroom. The lighting is high-key and modern, emphasizing a positive learning environment. The image is cropped as a square avatar, fitting a professional educational interface with a clean, optimistic vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOVw9eXFqDn35hHeV44KbtfQUkrX8lbXCvpo5BR4bj82BVtRyXWbJA6MmC93F-3CaBX6z0EUR0EEZq0n-qgXlWzPlSnhhzAdsj9N29Ias-Rq15gvB9qtv6FGcrcqexDazSVKHf0BzvdvxVJ3BJdDBSxhcE1U6epTpknOLVftU2pkBUjgqVuii_NdzCXBV-pK4ewZfQqmn-AL5xqo7MeoOG0Yu8bme2fub0TwT7sa1RW5mWvfssBaeBrDN7Ir6Ty-Oryj2LPzr1_Fhq"/>
+<div class="flex-1 min-w-0">
+<h3 class="font-label-md text-label-md text-text-primary truncate">Marcus Johnson</h3>
+<p class="font-body-md text-[13px] text-text-secondary truncate">Grade 8 • Specific Learning Disability</p>
+<div class="mt-2 inline-flex items-center gap-1 bg-surface-main border border-border-subtle px-2 py-0.5 rounded text-[11px] font-medium text-text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                                IEP Due: Oct 15
+                            </div>
+</div>
+</div>
+<!-- Student Card Inactive -->
+<div class="p-3 mb-2 hover:bg-surface-alt rounded-lg border border-transparent transition-colors flex gap-3 cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-label-md text-label-md">
+                            SL
+                        </div>
+<div class="flex-1 min-w-0">
+<h3 class="font-label-md text-label-md text-text-primary truncate">Sarah Lee</h3>
+<p class="font-body-md text-[13px] text-text-secondary truncate">Grade 7 • Autism Spectrum</p>
+<div class="mt-2 inline-flex items-center gap-1 bg-surface-main border border-border-subtle px-2 py-0.5 rounded text-[11px] font-medium text-text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                                On Track
+                            </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Panel B: Active IEP Editor (50%) -->
+<section class="flex-1 bg-surface-main rounded-xl border border-border-subtle flex flex-col overflow-hidden min-w-0">
+<!-- Editor Header -->
+<div class="px-6 py-5 border-b border-border-subtle flex justify-between items-start bg-surface-alt/30">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-accent-peach text-primary font-label-md text-[12px] px-2 py-0.5 rounded">Draft</span>
+<span class="font-body-md text-[13px] text-text-secondary">Last edited 2 hrs ago</span>
+</div>
+<h2 class="font-headline-lg text-headline-md text-text-primary mt-1">Marcus Johnson: Annual IEP Review</h2>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-full border border-border-subtle text-text-primary font-label-md text-label-md hover:bg-surface-alt transition-colors">
+                            Preview
+                        </button>
+<button class="px-4 py-2 rounded-full bg-primary-container text-on-error font-label-md text-label-md hover:bg-surface-tint transition-colors">
+                            Save Draft
+                        </button>
+</div>
+</div>
+<!-- Editor Form Area -->
+<div class="flex-1 overflow-y-auto p-6 bg-surface-main">
+<div class="max-w-3xl mx-auto space-y-8">
+<!-- Section: Present Levels -->
+<div class="space-y-4">
+<h3 class="font-headline-md text-[20px] text-text-primary border-b border-border-subtle pb-2">Present Levels of Performance</h3>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-text-primary block">Reading Comprehension</label>
+<textarea class="w-full p-4 bg-surface-alt border border-border-subtle rounded-xl focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-text-primary outline-none transition-all resize-y" placeholder="Describe current reading level and specific challenges..." rows="3"></textarea>
+</div>
+</div>
+<!-- Section: Measurable Goals -->
+<div class="space-y-4">
+<div class="flex justify-between items-center border-b border-border-subtle pb-2">
+<h3 class="font-headline-md text-[20px] text-text-primary">Measurable Annual Goals</h3>
+<button class="text-primary hover:text-surface-tint flex items-center gap-1 font-label-md text-[13px]">
+<span class="material-symbols-outlined text-[18px]">add_circle</span> Add Goal
+                                </button>
+</div>
+<!-- Goal Card -->
+<div class="border border-border-subtle rounded-xl p-4 bg-surface-alt/50 relative group">
+<button class="absolute top-4 right-4 text-text-secondary hover:text-error opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+<div>
+<label class="font-label-md text-[13px] text-text-secondary block mb-1">Goal Area</label>
+<select class="w-full p-2.5 bg-surface-main border border-border-subtle rounded-lg focus:border-primary outline-none font-body-md text-body-md">
+<option>Reading Fluency</option>
+<option>Math Calculation</option>
+</select>
+</div>
+<div>
+<label class="font-label-md text-[13px] text-text-secondary block mb-1">Target Date</label>
+<input class="w-full p-2.5 bg-surface-main border border-border-subtle rounded-lg focus:border-primary outline-none font-body-md text-body-md" type="date"/>
+</div>
+</div>
+<div>
+<label class="font-label-md text-[13px] text-text-secondary block mb-1">Specific Goal Formulation</label>
+<textarea class="w-full p-3 bg-surface-main border border-border-subtle rounded-lg focus:border-primary outline-none font-body-md text-body-md resize-none" placeholder="By [date], when given [condition], the student will [behavior]..." rows="2"></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Panel C: AI Assistant (25%) -->
+<section class="w-1/4 bg-surface-alt rounded-xl border border-border-subtle flex flex-col overflow-hidden flex-shrink-0">
+<div class="p-4 border-b border-border-subtle bg-surface-main flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-container">auto_awesome</span>
+<h2 class="font-headline-md text-[16px] font-semibold text-text-primary">Pedagogy Assistant</h2>
+</div>
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
+<!-- AI Suggestion Card -->
+<div class="bg-surface-main border border-border-subtle rounded-xl p-3 shadow-sm shadow-primary/5">
+<div class="flex items-center gap-2 mb-2 text-tertiary-container font-label-md text-[12px]">
+<span class="material-symbols-outlined text-[16px]">lightbulb</span>
+                            Goal Suggestion
+                        </div>
+<p class="font-body-md text-[14px] text-text-primary leading-relaxed">
+                            Based on Marcus's present levels in Reading Comprehension, you might consider this SMART goal: "By October 2024, given a 7th-grade level informational text, Marcus will accurately identify the main idea and 3 supporting details in 4 out of 5 trials."
+                        </p>
+<div class="mt-3 flex gap-2">
+<button class="bg-surface-container text-primary font-label-md text-[12px] px-3 py-1.5 rounded-lg hover:bg-accent-peach transition-colors">
+                                Apply to Form
+                            </button>
+<button class="border border-border-subtle text-text-secondary font-label-md text-[12px] px-3 py-1.5 rounded-lg hover:bg-surface-main transition-colors">
+                                Refine
+                            </button>
+</div>
+</div>
+<!-- User Message -->
+<div class="self-end max-w-[85%] bg-primary-container text-on-error rounded-2xl rounded-tr-sm px-4 py-2 shadow-sm">
+<p class="font-body-md text-[14px]">How should I adapt the accommodations for his new science lab class?</p>
+</div>
+</div>
+<!-- Chat Input -->
+<div class="p-3 bg-surface-main border-t border-border-subtle">
+<div class="relative">
+<input class="w-full pl-4 pr-10 py-3 bg-surface-alt border border-border-subtle rounded-xl focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-[14px] text-text-primary placeholder:text-text-secondary outline-none transition-all" placeholder="Ask for strategies, goal ideas..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-primary p-1.5 rounded-lg hover:bg-accent-peach transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

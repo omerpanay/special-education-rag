@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduRAG - Behavioral Observations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#faf9fa",
+                      "danger-coral": "#E07A5F",
+                      "on-tertiary-fixed-variant": "#5f4027",
+                      "surface-container-high": "#e9e8e9",
+                      "secondary-container": "#c1e8d6",
+                      "bg-dark": "#0F1419",
+                      "on-primary-container": "#ceeefd",
+                      "inverse-surface": "#2f3131",
+                      "on-error-container": "#93000a",
+                      "primary-fixed": "#c8e7f7",
+                      "on-surface-variant": "#42484b",
+                      "secondary": "#426657",
+                      "secondary-fixed": "#c4ebd9",
+                      "on-error": "#ffffff",
+                      "success-eucalyptus": "#81B29A",
+                      "background": "#faf9fa",
+                      "tertiary": "#6a4930",
+                      "accent-amber": "#E8A838",
+                      "on-primary-fixed-variant": "#2d4b57",
+                      "on-primary": "#ffffff",
+                      "outline-variant": "#c2c7cb",
+                      "surface-border": "#E2E8F0",
+                      "tertiary-container": "#856146",
+                      "surface-tint": "#45636f",
+                      "primary": "#375561",
+                      "tertiary-fixed": "#ffdcc4",
+                      "on-primary-fixed": "#001f29",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#2a4d40",
+                      "primary-fixed-dim": "#accbda",
+                      "surface-container-low": "#f4f3f4",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#e3e2e3",
+                      "on-secondary": "#ffffff",
+                      "bg-light": "#F8FAFB",
+                      "surface-variant": "#e3e2e3",
+                      "on-surface": "#1a1c1d",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#a8cfbd",
+                      "on-secondary-fixed": "#002116",
+                      "inverse-on-surface": "#f1f0f1",
+                      "surface-bright": "#faf9fa",
+                      "text-main": "#2D3748",
+                      "on-background": "#1a1c1d",
+                      "on-tertiary-fixed": "#2d1603",
+                      "surface-dim": "#dadada",
+                      "surface-container": "#eeedee",
+                      "inverse-primary": "#accbda",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#466a5b",
+                      "primary-container": "#4f6d7a",
+                      "on-tertiary-container": "#ffe4d2",
+                      "outline": "#72787b",
+                      "tertiary-fixed-dim": "#ebbd9d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "12px",
+                      "xl": "16px",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-desktop": "48px",
+                      "xs": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "gutter": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "headline-xl": ["Inter"], "body-lg": ["Inter"], "label-sm": ["Inter"], "headline-md": ["Inter"], "headline-lg": ["Inter"], "body-md": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "headline-lg-mobile": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-xl": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.25", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.25", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-bg-dark text-on-surface overflow-x-hidden min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-md border-r border-outline-variant bg-bg-dark w-64 z-50">
+<div class="flex items-center gap-md mb-xl px-md">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</div>
+<div>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary-fixed-dim">EduRAG</h1>
+<p class="text-label-sm font-label-sm text-outline-variant">AI Assistant</p>
+</div>
+</div>
+<nav class="flex flex-col gap-sm flex-grow">
+<a class="flex items-center gap-md text-outline-variant px-md py-sm hover:bg-surface-container-lowest transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md text-outline-variant px-md py-sm hover:bg-surface-container-lowest transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="text-label-md font-label-md">Ask AI</span>
+</a>
+<a class="flex items-center gap-md text-outline-variant px-md py-sm hover:bg-surface-container-lowest transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-label-md font-label-md">Students</span>
+</a>
+<!-- Active Navigation -->
+<a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-sm scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span class="text-label-md font-label-md">Observations</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-sm pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md text-outline-variant px-md py-sm hover:bg-surface-container-lowest transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md text-outline-variant px-md py-sm hover:bg-surface-container-lowest transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="text-label-md font-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center w-full px-margin-desktop py-md bg-bg-dark/80 backdrop-blur-md">
+<div class="flex items-center gap-lg">
+<h2 class="text-headline-md font-headline-md font-bold text-primary-fixed-dim">EduRAG</h2>
+<div class="relative w-80">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container-lowest/5 border-none rounded-full py-2 pl-xl pr-md text-label-md focus:ring-2 focus:ring-primary-fixed-dim text-white placeholder:text-outline-variant" placeholder="Search records..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-outline-variant hover:text-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-outline-variant hover:text-primary-fixed-dim">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A professional headshot of a friendly-looking special education teacher in their 40s. The lighting is soft and natural, coming from a window in a modern classroom setting. The educator wears a professional navy blue shirt, reflecting a stable and trust-worthy atmosphere. The background is slightly blurred showing organized educational materials." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY8Rv2lysGDYAPtZXRkuNa03fJl9BZpSAoyxvVh5limXlVffgkww6jTuS8u1Y66wkCJSQa9j7h-QArBkfW8KSprnnM0m8uJ4NtsyWGEjJ9uT5uyYqqbmoplGgIxPhlSztZDzlZdwt07nuwg1AfVPrGnxJMz3XpYaDlfeecPgImmAjnZ3kaNUBHBOB2GtOvFaEhDwxZHAtSya77TRdxR0l9n-N6OC731IdwlJy7jytxI607WzO-pAcRAjtjHQhvt32f-h-JbcIqyg4"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="px-margin-desktop py-lg">
+<!-- Page Header -->
+<div class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-lg">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-white mb-xs">Behavioral Observations</h1>
+<p class="text-body-md font-body-md text-outline-variant max-w-2xl">Record and analyze student behavior with AI-powered ABC (Antecedent, Behavior, Consequence) analysis to track progress and identify triggers.</p>
+</div>
+</div>
+<!-- Student Selector (First Step) -->
+<div class="mb-xl relative inline-block w-full max-w-sm">
+<label class="text-label-sm font-label-sm text-outline-variant mb-sm block">Selected Student</label>
+<div class="flex items-center justify-between bg-surface-container-lowest/10 p-md rounded-lg border border-primary-container cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-bold">MA</div>
+<span class="text-body-md font-bold text-white">Marcus Aurelius</span>
+</div>
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+</div>
+<!-- Two-Column Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: New Observation Form -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<section class="bg-surface-container-lowest/5 border border-outline-variant/20 rounded-lg p-lg shadow-sm">
+<h3 class="text-headline-sm font-headline-sm text-white mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="edit_note">edit_note</span>
+                            New Observation
+                        </h3>
+<label class="text-label-md font-label-md text-outline-variant mb-md block">Category</label>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-sm mb-lg">
+<button class="flex flex-col items-center justify-center gap-xs p-sm rounded-lg bg-primary-container/20 border border-primary-container text-on-primary-container hover:bg-primary-container/30 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="ads_click">ads_click</span>
+<span class="text-[11px] font-semibold text-center leading-tight">Attention</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-sm rounded-lg bg-secondary-container/10 border border-transparent text-outline-variant hover:border-secondary-container transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-[11px] font-semibold text-center leading-tight">Communication</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-sm rounded-lg bg-tertiary-container/10 border border-transparent text-outline-variant hover:border-tertiary-container transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="groups">groups</span>
+<span class="text-[11px] font-semibold text-center leading-tight">Social Behavior</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-sm rounded-lg bg-accent-amber/10 border border-transparent text-outline-variant hover:border-accent-amber transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="school">school</span>
+<span class="text-[11px] font-semibold text-center leading-tight">Academic Skills</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-sm rounded-lg bg-danger-coral/10 border border-transparent text-outline-variant hover:border-danger-coral transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="sentiment_very_dissatisfied">sentiment_very_dissatisfied</span>
+<span class="text-[11px] font-semibold text-center leading-tight">Emotional Reg.</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-sm rounded-lg bg-success-eucalyptus/10 border border-transparent text-outline-variant hover:border-success-eucalyptus transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="directions_run">directions_run</span>
+<span class="text-[11px] font-semibold text-center leading-tight">Motor Skills</span>
+</button>
+</div>
+<div class="mb-lg">
+<label class="text-label-md font-label-md text-outline-variant mb-sm block">Observation Summary</label>
+<textarea class="w-full bg-black/20 border border-outline-variant/30 rounded-lg p-md text-body-md text-white min-h-[160px] focus:ring-2 focus:ring-primary-fixed-dim focus:border-transparent placeholder:text-outline-variant/40 resize-none" placeholder="Describe the behavior observed, including the context and outcome..."></textarea>
+</div>
+<button class="w-full bg-primary text-white font-label-md py-md rounded-lg hover:bg-primary-container transition-all duration-200 flex items-center justify-center gap-md shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                            Record Observation
+                        </button>
+<div class="mt-lg flex items-center gap-md p-md bg-primary-container/10 rounded-lg border border-primary-container/20">
+<div class="relative w-5 h-5">
+<div class="absolute inset-0 border-2 border-primary-fixed-dim/30 rounded-full"></div>
+<div class="absolute inset-0 border-2 border-primary-fixed-dim border-t-transparent rounded-full animate-spin"></div>
+</div>
+<p class="text-label-md font-label-md text-primary-fixed-dim">AI is analyzing behavior patterns...</p>
+</div>
+</section>
+</div>
+<!-- Right Column: Observation History -->
+<div class="lg:col-span-7">
+<h3 class="text-headline-sm font-headline-sm text-white mb-lg flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="history">history</span>
+                            Recent History
+                        </div>
+<span class="text-label-sm font-label-sm text-outline-variant">Showing 1 record</span>
+</h3>
+<div class="flex flex-col gap-lg">
+<!-- Active Example: Emotional Regulation -->
+<article class="bg-surface-container-lowest/5 border border-outline-variant/20 rounded-lg overflow-hidden shadow-sm transition-all hover:border-danger-coral/30">
+<div class="p-lg">
+<div class="flex items-start justify-between mb-md">
+<div class="flex items-center gap-md">
+<div class="px-sm py-1 rounded bg-danger-coral/10 text-danger-coral border border-danger-coral/20 text-[11px] font-bold tracking-wider uppercase">
+                                            Emotional Regulation
+                                        </div>
+<span class="text-label-sm font-label-sm text-outline-variant">Today at 10:45 AM</span>
+</div>
+<div class="px-xs py-[2px] rounded bg-secondary-container/10 text-success-eucalyptus text-[10px] font-mono font-bold border border-success-eucalyptus/20">
+                                        Latency: 840ms
+                                    </div>
+</div>
+<p class="text-body-md font-body-md text-white/90 leading-relaxed">
+                                    Student became frustrated during transition from math to lunch. Refused to line up and began vocalizing loudly.
+                                </p>
+</div>
+<!-- Expanded ABC Analysis Section -->
+<div class="bg-black/30 border-t border-outline-variant/10 p-lg grid grid-cols-1 md:grid-cols-3 gap-md">
+<div class="space-y-xs">
+<span class="text-[10px] font-bold text-primary-fixed-dim tracking-widest uppercase">Antecedent</span>
+<p class="text-label-md text-outline-variant leading-snug">Transitioning from preferred activity (Math games on tablet).</p>
+</div>
+<div class="space-y-xs">
+<span class="text-[10px] font-bold text-accent-amber tracking-widest uppercase">Behavior</span>
+<p class="text-label-md text-outline-variant leading-snug">Closing eyes tightly and humming loudly for 45 seconds.</p>
+</div>
+<div class="space-y-xs">
+<span class="text-[10px] font-bold text-success-eucalyptus tracking-widest uppercase">Consequence</span>
+<p class="text-label-md text-outline-variant leading-snug">Brief verbal prompt and visual timer (2 mins cool down).</p>
+</div>
+</div>
+<div class="px-lg py-sm bg-surface-container-lowest/10 flex items-center gap-md">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="auto_awesome" data-weight="fill" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<p class="text-[12px] italic text-outline-variant/80">AI Suggestion: Sensory overload likely due to sudden audio chime. Use vibration cues next time.</p>
+</div>
+</article>
+<!-- Divider for Empty State Context -->
+<div class="mt-lg pt-xl border-t border-outline-variant/10">
+<p class="text-label-sm font-label-sm text-outline-variant/60 mb-md">Other students in class:</p>
+<div class="bg-surface-container-lowest/5 border border-dashed border-outline-variant/30 rounded-lg p-xl flex flex-col items-center justify-center text-center">
+<div class="w-16 h-16 rounded-full bg-outline-variant/10 flex items-center justify-center text-outline-variant/30 mb-md">
+<span class="material-symbols-outlined text-[32px]" data-icon="person_off">person_off</span>
+</div>
+<p class="text-body-md font-body-md text-outline-variant/60 italic">No observations recorded yet for other students in this session.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

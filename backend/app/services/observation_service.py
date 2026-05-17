@@ -37,27 +37,27 @@ settings = get_settings()
 logger = logging.getLogger("edurag.observation")
 
 # ── Structured Output Prompt ──
-# Bu prompt LLM'e transkriptten ABC modeli çıkarmasını söyler
-STRUCTURING_PROMPT = """Sen özel eğitim alanında uzman bir davranış analistisin.
-Aşağıdaki öğretmen gözlem transkriptinden yapılandırılmış bilgi çıkar.
+# This prompt instructs the LLM to extract ABC model from transcript
+STRUCTURING_PROMPT = """You are an expert behavior analyst specializing in special education.
+Extract structured information from the teacher's observation transcript below.
 
-ÇIKTI FORMATI (Sadece JSON döndür, başka hiçbir şey yazma):
+OUTPUT FORMAT (Return only JSON, nothing else):
 {{
-  "category": "<Davranış|Akademik|Kriz|Sosyal|İletişim>",
-  "summary": "<Gözlemin 1-2 cümlelik özeti>",
-  "antecedent": "<Davranıştan ÖNCE olan olay veya bağlam. Transkriptte açıkça belirtilmese bile bağlamdan çıkar. Örneğin 'ders sırasında' gibi ifadeler tetikleyicidir>",
-  "behavior": "<Gözlemlenen davranış — öğrencinin ne yaptığı>",
-  "consequence": "<Davranıştan SONRA ne oldu — öğretmenin tepkisi veya öğrencinin durumu>"
+  "category": "<Behavior|Academic|Crisis|Social|Communication>",
+  "summary": "<1-2 sentence summary of the observation>",
+  "antecedent": "<Event or context BEFORE the behavior. Even if not explicitly stated in the transcript, infer from context. For example, 'during class' is a trigger>",
+  "behavior": "<The observed behavior — what the student did>",
+  "consequence": "<What happened AFTER the behavior — the teacher's response or student's outcome>"
 }}
 
-KURALLAR:
-1. category değeri MUTLAKA yukarıdaki 5 seçenekten biri olmalı
-2. summary, antecedent, behavior, consequence alanlarının HEPSI doldurulmalı
-3. Transkriptte açıkça belirtilmese bile bağlamdan makul çıkarım yap, null KULLANMA
-4. Tüm metin Türkçe olmalı
-5. Sadece JSON döndür, açıklama ekleme
+RULES:
+1. category MUST be one of the 5 options above (in English)
+2. summary, antecedent, behavior, consequence fields MUST ALL be filled
+3. Even if not explicitly stated in the transcript, make reasonable inferences from context — do NOT use null
+4. ALL text MUST be in English. If the transcript is in another language, translate your output to English.
+5. Return only JSON, no explanations
 
-TRANSKRİPT:
+TRANSCRIPT:
 {transcript}
 """
 
@@ -244,7 +244,7 @@ async def structure_transcript(transcript: str) -> dict:
     from langchain_groq import ChatGroq
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "Sen bir JSON üretici asistansın. Sadece geçerli JSON döndür."),
+        ("system", "You are a JSON generator assistant. Return only valid JSON."),
         ("human", STRUCTURING_PROMPT),
     ])
 
@@ -272,7 +272,7 @@ async def structure_transcript(transcript: str) -> dict:
         )
         # Fallback: En azından summary'yi transkriptten al
         return {
-            "category": "Davranış",
+            "category": "Behavior",
             "summary": transcript[:200],
             "antecedent": None,
             "behavior": None,
@@ -281,14 +281,22 @@ async def structure_transcript(transcript: str) -> dict:
 
 
 def parse_category(category_str: str) -> ObservationCategory:
-    """Kategori stringini enum'a çevir (güvenli fallback ile).
+    """Convert category string to enum (with safe fallback).
 
-    LLM çıktısı her zaman tam eşleşmeyebilir:
-    - "davranış" → BEHAVIOR ✅
-    - "Davranışsal" → BEHAVIOR ✅ (fuzzy match)
+    LLM output may not always match exactly:
+    - "behavior" → BEHAVIOR ✅
+    - "Behavioral" → BEHAVIOR ✅ (fuzzy match)
+    - "Davranış" → BEHAVIOR ✅ (Turkish legacy support)
     - "xyz" → BEHAVIOR (fallback)
     """
     category_map = {
+        # English categories (primary)
+        "behavior": ObservationCategory.BEHAVIOR,
+        "academic": ObservationCategory.ACADEMIC,
+        "crisis": ObservationCategory.CRISIS,
+        "social": ObservationCategory.SOCIAL,
+        "communication": ObservationCategory.COMMUNICATION,
+        # Turkish categories (legacy support)
         "davranış": ObservationCategory.BEHAVIOR,
         "akademik": ObservationCategory.ACADEMIC,
         "kriz": ObservationCategory.CRISIS,
@@ -298,11 +306,11 @@ def parse_category(category_str: str) -> ObservationCategory:
 
     normalized = category_str.lower().strip()
 
-    # Tam eşleşme
+    # Exact match
     if normalized in category_map:
         return category_map[normalized]
 
-    # Fuzzy match — kategori stringi içinde anahtar kelime ara
+    # Fuzzy match — search for keyword inside category string
     for key, value in category_map.items():
         if key in normalized:
             return value

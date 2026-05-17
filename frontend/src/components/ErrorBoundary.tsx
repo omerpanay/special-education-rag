@@ -12,7 +12,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('[EduRAG ErrorBoundary]', error, info.componentStack);
+    console.error('[SENSEI ErrorBoundary]', error, info.componentStack);
   }
 
   handleReload = () => window.location.reload();

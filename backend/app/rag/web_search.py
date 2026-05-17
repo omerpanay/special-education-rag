@@ -92,10 +92,8 @@ async def search_web(
 def format_web_results_as_context(results: list[WebSearchResult]) -> str:
     """Web sonuçlarını LLM bağlam formatına çevir.
 
-    LLM'in yerel ve web kaynaklarını ayırt edebilmesi için
-    farklı bir delimiter kullanıyoruz:
-    - Yerel: --- BAĞLAM N (Kaynak: ...) ---
-    - Web:   --- WEB KAYNAK N (URL: ...) ---
+    Format LLM'in [Web: <başlık>] atfı yapabilmesi için optimize edilmiştir.
+    Başlık satırı açıkça belirtilir ki LLM tam başlığı kopyalasın.
     """
     if not results:
         return ""
@@ -103,7 +101,7 @@ def format_web_results_as_context(results: list[WebSearchResult]) -> str:
     parts = []
     for idx, result in enumerate(results, 1):
         parts.append(
-            f"--- WEB KAYNAK {idx} (Başlık: {result.title}) ---\n"
+            f"[WEB KAYNAK {idx}] Başlık: {result.title}\n"
             f"URL: {result.url}\n"
             f"{result.content}\n"
         )

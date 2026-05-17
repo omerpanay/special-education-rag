@@ -23,7 +23,23 @@ from app.schemas.auth import (
 )
 from app.services.auth_service import AuthService
 
+from app.core.security import get_current_teacher
+from app.models.teacher import Teacher
+
 router = APIRouter(prefix="/auth", tags=["authentication"])
+
+
+@router.get(
+    "/me",
+    response_model=TeacherResponse,
+    summary="Mevcut öğretmen bilgisi",
+)
+async def get_me(
+    current_teacher: Teacher = Depends(get_current_teacher),
+) -> TeacherResponse:
+    """GET /api/v1/auth/me — JWT ile giriş yapmış öğretmen bilgisini döner."""
+    return TeacherResponse.model_validate(current_teacher)
+
 
 
 @router.post(

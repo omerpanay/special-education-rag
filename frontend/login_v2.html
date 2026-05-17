@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduRAG - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#00a7cb",
+                        "surface-variant": "#f7ddd5",
+                        "outline-variant": "#e1bfb5",
+                        "primary": "#ab3500",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#765b06",
+                        "surface-tint": "#ab3500",
+                        "surface-container-lowest": "#ffffff",
+                        "text-secondary": "#4F5D75",
+                        "accent-peach": "#FFF1E6",
+                        "tertiary": "#00677e",
+                        "inverse-surface": "#3c2d28",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fff8f6",
+                        "on-tertiary-container": "#003744",
+                        "secondary-container": "#ffd97d",
+                        "on-background": "#261814",
+                        "on-surface": "#261814",
+                        "surface-main": "#FFFFFF",
+                        "error-container": "#ffdad6",
+                        "border-subtle": "#E9ECEF",
+                        "on-error": "#ffffff",
+                        "background": "#fff8f6",
+                        "on-tertiary-fixed": "#001f28",
+                        "primary-container": "#ff6b35",
+                        "outline": "#8d7168",
+                        "inverse-on-surface": "#ffede8",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#390c00",
+                        "tertiary-fixed-dim": "#59d5fb",
+                        "on-secondary-fixed-variant": "#594400",
+                        "inverse-primary": "#ffb59d",
+                        "on-tertiary-fixed-variant": "#004e60",
+                        "secondary-fixed": "#ffdf96",
+                        "on-surface-variant": "#594139",
+                        "on-primary-fixed-variant": "#832600",
+                        "on-secondary-fixed": "#251a00",
+                        "surface-container-low": "#fff1ed",
+                        "on-primary-container": "#5f1900",
+                        "secondary-fixed-dim": "#e7c269",
+                        "surface": "#fff8f6",
+                        "surface-container": "#ffe9e3",
+                        "surface-alt": "#F8F9FA",
+                        "surface-container-high": "#fde3db",
+                        "primary-fixed-dim": "#ffb59d",
+                        "primary-fixed": "#ffdbd0",
+                        "surface-dim": "#eed5cd",
+                        "surface-container-highest": "#f7ddd5",
+                        "on-tertiary": "#ffffff",
+                        "text-primary": "#2D3142",
+                        "tertiary-fixed": "#b5ebff",
+                        "on-secondary-container": "#785d09"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "40px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "headline-lg": ["Outfit"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .ambient-shadow {
+            box-shadow: 0 10px 40px -10px rgba(171, 53, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-surface relative overflow-hidden font-body-md text-body-md text-text-primary">
+<!-- Ambient Background Shapes -->
+<div class="absolute top-[-10%] left-[-5%] w-[40vw] h-[40vw] rounded-full bg-surface-container-high blur-[100px] opacity-70 pointer-events-none"></div>
+<div class="absolute bottom-[-15%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-surface-variant blur-[120px] opacity-60 pointer-events-none"></div>
+<div class="absolute top-[20%] right-[10%] w-[20vw] h-[20vw] rounded-full bg-surface-container-highest blur-[80px] opacity-40 pointer-events-none"></div>
+<!-- Login Card -->
+<main class="w-full max-w-md px-margin-mobile relative z-10">
+<div class="bg-surface-main rounded-xl border border-border-subtle ambient-shadow p-8 sm:p-10">
+<!-- Header -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent-peach text-primary-container mb-4">
+<span class="material-symbols-outlined" style="font-size: 28px;">psychology</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-text-primary mb-2">EduRAG</h1>
+<p class="font-body-md text-body-md text-text-secondary">Welcome back. Please enter your details.</p>
+</div>
+<!-- Form -->
+<form action="#" class="space-y-5" method="POST">
+<!-- Email Field -->
+<div>
+<label class="block font-label-md text-label-md text-text-primary mb-2" for="email">Email</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-text-secondary">
+<span class="material-symbols-outlined" style="font-size: 20px;">mail</span>
+</span>
+<input class="w-full pl-11 pr-4 py-3 rounded-[12px] border border-border-subtle bg-surface-main text-text-primary placeholder-text-secondary focus:outline-none focus:ring-0 focus:border-primary-container focus:ring-primary-container transition-colors" id="email" name="email" placeholder="Enter your email" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<label class="block font-label-md text-label-md text-text-primary mb-2" for="password">Password</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-4 text-text-secondary">
+<span class="material-symbols-outlined" style="font-size: 20px;">lock</span>
+</span>
+<input class="w-full pl-11 pr-4 py-3 rounded-[12px] border border-border-subtle bg-surface-main text-text-primary placeholder-text-secondary focus:outline-none focus:ring-0 focus:border-primary-container focus:ring-primary-container transition-colors" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Actions Row -->
+<div class="flex items-center justify-between mt-2">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-border-subtle text-primary-container focus:ring-primary-container bg-surface-main" id="remember-me" name="remember-me" type="checkbox"/>
+<label class="ml-2 block font-label-md text-label-md text-text-secondary" for="remember-me">
+                            Remember me
+                        </label>
+</div>
+<a class="font-label-md text-label-md text-primary-container hover:text-primary transition-colors" href="#">
+                        Forgot Password?
+                    </a>
+</div>
+<!-- Submit Button -->
+<button class="w-full py-3 mt-6 rounded-full bg-primary-container text-on-primary font-label-md text-label-md hover:bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container flex items-center justify-center gap-2" type="submit">
+                    Sign in
+                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+</form>
+<!-- Footer -->
+<p class="mt-8 text-center font-body-md text-body-md text-text-secondary">
+                Don't have an account? 
+                <a class="font-label-md text-label-md text-primary-container hover:text-primary transition-colors ml-1" href="#">
+                    Sign up
+                </a>
+</p>
+</div>
+</main>
+</body></html>

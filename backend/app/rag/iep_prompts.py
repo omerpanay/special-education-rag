@@ -1,137 +1,139 @@
-"""MEB BEP Formatına Uygun IEP Prompt Template'leri.
+"""IEP (Individualized Education Plan) Prompt Templates.
 
-Kaynaklar:
-  - MEB Özel Eğitim ve Rehberlik Hizmetleri Genel Müdürlüğü
-  - "BEP: Tüm Öğretmenler İçin Yol Haritası" Kılavuzu (2022)
-  - BEP_Word.docx (EK-1 Örnek Format)
+Sources:
+  - MEB Special Education and Guidance Services Directorate
+  - "IEP: A Roadmap for All Teachers" Guide (2022)
+  - Standard IEP format aligned with international best practices
 
-BEP Dosyası 5 Bölümden Oluşur:
-  I   - Öğrenci Bilgileri
-  II  - Eğitsel Performans Formu
-  III - Bireyselleştirilmiş Eğitim Planı (Uzun/Kısa Dönemli Amaçlar)
-  IV  - BEP Geliştirme Birim Kararları
-  V   - BEP Birim Üyeleri (Manuel — AI üretmez)
+IEP Structure — 5 Sections:
+  I   - Student Information
+  II  - Educational Performance Assessment
+  III - Individualized Education Plan (Long/Short-Term Goals)
+  IV  - IEP Team Decisions
+  V   - IEP Team Members (Manual — AI does not generate)
 """
 
 from langchain_core.prompts import ChatPromptTemplate
 
 IEP_SYSTEM_TEMPLATE = """\
-Sen MEB (Millî Eğitim Bakanlığı) BEP formatını bilen, deneyimli bir özel eğitim uzmanısın.
-Görevin, öğrenci profili ve akademik kaynaklara dayanarak MEB formatına uygun
-Bireyselleştirilmiş Eğitim Programı (BEP) taslağı üretmektir.
+You are an experienced special education specialist with deep knowledge of
+Individualized Education Plan (IEP) frameworks and evidence-based practices.
+Your task is to generate a structured, actionable IEP draft based on the
+student profile and academic sources provided.
 
-### BEP YAZIM KURALLARI ###
+### IEP WRITING RULES ###
 
-1. AMAÇ YAZIM KURALLARI:
-   - Amaçlar gözlemlenebilir, ölçülebilir ve net olmalıdır
-   - Geniş zaman kipi kullanılır: "yapar", "eder", "sayar", "okur"
-   - YANLIŞ: "Okuma becerisini geliştirebilme" (belirsiz, ölçülemez)
-   - DOĞRU: "İki heceli kelimeleri doğru okur" (net, ölçülebilir)
-   - Herkesin aynı şeyi anlaması gerekir
+1. GOAL WRITING RULES:
+   - Goals must be observable, measurable, and specific (SMART format)
+   - Use present simple tense: "identifies", "reads", "counts", "communicates"
+   - WRONG: "Improve reading skills" (vague, unmeasurable)
+   - CORRECT: "Reads two-syllable words correctly in 4/5 trials" (specific, measurable)
+   - Every reader must understand the goal the same way
 
-2. ÖLÇÜT YAZIM KURALLARI:
-   - Deneme/başarı formatında yazılır
-   - Örnek: "5/5 (%100)", "4/5 (%80)", "3/5 (%60)"
-   - Kazandırılmak istenen davranış kaç denemede başarılı sayılacak
+2. CRITERION WRITING RULES:
+   - Write in trials/success format
+   - Examples: "4/5 trials (80%)", "3/5 trials (60%)", "5/5 trials (100%)"
+   - Criterion defines how many successful trials = goal achieved
 
-3. PERFORMANS DÜZEYİ:
-   - Öğrencinin YAPABİLDİKLERİ yazılır
-   - Yapamadıkları burada belirtilmez, onlar hedef olarak planlanır
+3. PERFORMANCE LEVEL:
+   - Document what the student CAN DO currently
+   - What they cannot do goes into goals/targets, not performance level
 
-4. GELİŞİM ALANLARI (engel türüne göre seç):
-   - Disleksi: Türkçe (okuma-yazma), ince motor, dikkat
-   - Otizm: İletişim, sosyal beceri, davranış düzenleme
-   - Zihinsel yetersizlik: Öz bakım, iletişim, akademik, günlük yaşam
-   - İşitme yetersizliği: Alıcı/ifade edici dil, akademik
-   - DEHB: Dikkat, sosyal beceri, akademik yapılandırma
+4. DEVELOPMENT AREAS (select based on disability type):
+   - Dyslexia: Reading/writing, fine motor, sustained attention
+   - Autism: Communication, social skills, behavior regulation
+   - Intellectual Disability: Self-care, communication, academics, daily living
+   - Hearing Impairment: Receptive/expressive language, academic skills
+   - ADHD: Attention, social skills, academic structure
 
-5. YÖNTEM VE TEKNİKLER:
-   - Doğrudan öğretim, model olma, ipuçlu öğretim
-   - Tekrarlı okuma, çok duyulu yaklaşım
-   - Görsel destekler, somutlaştırma
+5. METHODS AND TECHNIQUES:
+   - Direct instruction, modeling, prompting/fading
+   - Repeated reading, multisensory approaches
+   - Visual supports, concrete manipulatives
+   - Social stories, video modeling
 
-### ÇIKTI FORMATI ###
-Yanıtını MUTLAKA aşağıdaki JSON formatında ver. Başka metin ekleme.
+### OUTPUT FORMAT ###
+Your response MUST be in the following JSON format. Do not add any text outside the JSON.
 """
 
 IEP_HUMAN_TEMPLATE = """\
-Aşağıdaki öğrenci profili için MEB formatına uygun BEP taslağı üret.
+Generate a structured IEP draft for the following student profile.
 
-### ÖĞRENCİ PROFİLİ ###
-Ad-Soyad: {student_name}
-Eğitsel Tanı: {disability_type}
-Sınıf Seviyesi: {grade_level}. Sınıf
-Öğretmen Yetkinlik Notları: {competency_notes}
+### STUDENT PROFILE ###
+Full Name: {student_name}
+Educational Diagnosis: {disability_type}
+Grade Level: Grade {grade_level}
+Teacher Competency Notes: {competency_notes}
 {additional_context}
 
-### AKADEMİK KAYNAKLARDAN ALINAN BİLGİ ###
+### ACADEMIC KNOWLEDGE BASE ###
 {rag_context}
 
-### ODAK ALANLARI ###
+### FOCUS AREAS ###
 {focus_areas}
 
-### ÇIKTI ###
-Aşağıdaki JSON yapısında yanıt ver. Sadece JSON döndür, başka metin yazma:
+### OUTPUT ###
+Respond with the following JSON structure. Return only valid JSON, no other text:
 
 {{
   "student_info": {{
     "name": "{student_name}",
     "grade_level": {grade_level},
     "disability_type": "{disability_type}",
-    "educational_diagnosis": "<Türkçe eğitsel tanı açıklaması>",
-    "environment_adjustments": "<Eğitim ortamı düzenlemeleri önerisi>"
+    "educational_diagnosis": "<Brief description of the student's educational diagnosis>",
+    "environment_adjustments": "<Recommended classroom and environment accommodations>"
   }},
   "performance_assessment": {{
-    "development_history": "<Kısa gelişim öyküsü>",
+    "development_history": "<Brief developmental history relevant to education>",
     "areas": [
       {{
-        "area_name": "<Gelişim Alanı/Ders>",
-        "performance_level": "<Öğrencinin bu alandaki mevcut yapabildiği becerileri>",
+        "area_name": "<Development Area / Subject>",
+        "performance_level": "<Current skills the student CAN demonstrate in this area>",
         "behavior_problems": null
       }}
     ]
   }},
   "education_plan": [
     {{
-      "development_area": "<Gelişim Alanı/Ders>",
-      "long_term_goal": "<Uzun dönemli amaç — geniş zaman kipi ile>",
+      "development_area": "<Development Area / Subject>",
+      "long_term_goal": "<Annual long-term goal — observable, present simple tense>",
       "short_term_goals": [
         {{
-          "goal": "<Kısa dönemli amaç — gözlemlenebilir, ölçülebilir>",
-          "behaviors": ["<Hedef davranış 1>", "<Hedef davranış 2>"],
-          "criterion": "<Ölçüt: ör. 4/5 (%80)>",
-          "methods": ["<Yöntem 1>", "<Yöntem 2>"],
-          "materials": ["<Materyal 1>", "<Materyal 2>"],
-          "start_date": "<YYYY-AA-GG>",
-          "end_date": "<YYYY-AA-GG>",
-          "evaluation_method": "<Ölçme-değerlendirme yöntemi>",
-          "evaluation_dates": "<Değerlendirme sıklığı>",
+          "goal": "<Short-term goal — specific, measurable, observable>",
+          "behaviors": ["<Target behavior 1>", "<Target behavior 2>"],
+          "criterion": "<Mastery criterion: e.g. 4/5 trials (80%)>",
+          "methods": ["<Instructional method 1>", "<Instructional method 2>"],
+          "materials": ["<Material 1>", "<Material 2>"],
+          "start_date": "<YYYY-MM-DD>",
+          "end_date": "<YYYY-MM-DD>",
+          "evaluation_method": "<Assessment method>",
+          "evaluation_dates": "<Assessment frequency>",
           "result": null
         }}
       ],
-      "environment_adjustments": "<Bu alana özgü ortam düzenlemesi>"
+      "environment_adjustments": "<Area-specific accommodation or modification>"
     }}
   ],
   "unit_decisions": {{
     "school_services": [
       {{
-        "service_type": "<Hizmet türü>",
-        "area": "<Gelişim alanı/ders>",
-        "weekly_hours": <saat>,
-        "responsible": "<Sorumlu>"
+        "service_type": "<Service type: e.g. Resource Room, Speech Therapy>",
+        "area": "<Development area / subject>",
+        "weekly_hours": <number>,
+        "responsible": "<Responsible staff member>"
       }}
     ],
-    "family_info_frequency": "<Bilgilendirme sıklığı>",
-    "family_info_method": "<Bilgilendirme yöntemi>",
+    "family_info_frequency": "<How often family is informed>",
+    "family_info_method": "<Method of family communication>",
     "family_education": true,
-    "family_education_method": "<Aile eğitimi yöntemi>"
+    "family_education_method": "<Family training method>"
   }}
 }}
 """
 
 
 def get_iep_prompt() -> ChatPromptTemplate:
-    """MEB BEP formatına uygun IEP prompt template'i döndürür."""
+    """Returns a ChatPromptTemplate for IEP generation."""
     return ChatPromptTemplate.from_messages([
         ("system", IEP_SYSTEM_TEMPLATE),
         ("human", IEP_HUMAN_TEMPLATE),

@@ -1,35 +1,26 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { FileText, Sparkles, ChevronDown, ChevronRight, User, Download, RefreshCw } from 'lucide-react';
+import { FileText, Sparkles, ChevronDown, ChevronRight, User, RefreshCw, Printer, FileCheck, Check, Target, BookOpen, Building } from 'lucide-react';
 
 const API = 'http://localhost:8000/api/v1';
 const getToken = () => localStorage.getItem('access_token');
 
-interface Student {
-  id: string; name: string; disability_type: string;
-  grade_level: number; competency_notes?: string;
-}
+interface Student { id: string; name: string; disability_type: string; grade_level: number; }
 
 interface IEPDraft {
-  id: string;
-  student_id: string;
-  student_name: string;
-  content: any;
-  version: number;
-  status: string;
-  teacher_notes?: string;
-  created_at: string;
-  updated_at: string;
+  id: string; student_id: string; student_name: string;
+  content: any; version: number; status: string;
+  teacher_notes?: string; created_at: string; updated_at: string;
 }
 
 const DISABILITY_LABELS: Record<string, string> = {
-  disleksi: 'Disleksi', otizm: 'Otizm', zihin_yetersizligi: 'Zihinsel Yetersizlik',
-  isitme: 'İşitme Yetersizliği', bedensel: 'Bedensel Yetersizlik', dehb: 'DEHB',
+  disleksi: 'Dyslexia', otizm: 'Autism', zihin_yetersizligi: 'Intellectual Disability',
+  isitme: 'Hearing Impairment', bedensel: 'Physical Disability', dehb: 'ADHD',
 };
 
-const STATUS_LABELS: Record<string, { text: string; color: string }> = {
-  draft: { text: 'Taslak', color: 'var(--color-warning)' },
-  reviewed: { text: 'İncelendi', color: 'var(--color-primary-light)' },
-  finalized: { text: 'Kesinleşti', color: 'var(--color-accent)' },
+const STATUS: Record<string, { text: string; bg: string; color: string }> = {
+  draft: { text: 'Draft', bg: '#FEF3C7', color: '#92400E' },
+  reviewed: { text: 'Reviewed', bg: '#DBEAFE', color: '#1E40AF' },
+  finalized: { text: 'Finalized', bg: '#D1FAE5', color: '#065F46' },
 };
 
 export default function IEPGenerator() {
@@ -40,382 +31,347 @@ export default function IEPGenerator() {
   const [error, setError] = useState('');
   const [currentDraft, setCurrentDraft] = useState<IEPDraft | null>(null);
   const [drafts, setDrafts] = useState<IEPDraft[]>([]);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    student_info: true, performance: true, plan: true, decisions: false,
-  });
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ student_info: true, performance: true, plan: true, decisions: false });
 
-  useEffect(() => {
-    fetchStudents();
-  }, []);
+  useEffect(() => { fetchStudents(); }, []);
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch(`${API}/students`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setStudents(data.items || []);
-      }
-    } catch { /* silent */ }
+      const res = await fetch(`${API}/students`, { headers: { Authorization: `Bearer ${getToken()}` } });
+      if (res.ok) { const data = await res.json(); setStudents(data.items || []); }
+    } catch {}
   };
 
   const fetchDrafts = async (studentId: string) => {
+    if (!studentId) { setDrafts([]); return; }
     try {
-      const res = await fetch(`${API}/iep/student/${studentId}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setDrafts(data.items || []);
-      }
-    } catch { /* silent */ }
+      const res = await fetch(`${API}/iep/student/${studentId}`, { headers: { Authorization: `Bearer ${getToken()}` } });
+      if (res.ok) { const data = await res.json(); setDrafts(data.items || []); }
+    } catch {}
   };
 
   const handleStudentChange = (id: string) => {
-    setSelectedStudentId(id);
-    setCurrentDraft(null);
-    if (id) fetchDrafts(id);
-    else setDrafts([]);
+    setSelectedStudentId(id); setCurrentDraft(null); setError(''); fetchDrafts(id);
   };
 
   const handleGenerate = async (e: FormEvent) => {
     e.preventDefault();
     if (!selectedStudentId) return;
-    setGenerating(true);
-    setError('');
+    setGenerating(true); setError('');
     try {
       const res = await fetch(`${API}/iep/generate`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({
-          student_id: selectedStudentId,
-          additional_notes: additionalNotes || undefined,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ student_id: selectedStudentId, additional_notes: additionalNotes || undefined }),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.detail || 'BEP üretilirken hata oluştu');
-      } else {
-        const draft: IEPDraft = await res.json();
-        setCurrentDraft(draft);
-        fetchDrafts(selectedStudentId);
+        const errData = await res.json().catch(() => ({}));
+        setError(errData.detail || `Error ${res.status}: Generation failed`);
+        setGenerating(false);
+        return;
       }
-    } catch {
-      setError('Bağlantı hatası');
+      const newDraft = await res.json();
+      setCurrentDraft(newDraft);
+      // Auto-expand all sections
+      setExpandedSections({ student_info: true, performance: true, plan: true, decisions: true });
+      setAdditionalNotes('');
+      fetchDrafts(selectedStudentId);
+    } catch (err: any) {
+      setError(err?.message || 'Connection error. Make sure backend is running.');
     }
     setGenerating(false);
   };
 
-  const toggleSection = (key: string) => {
-    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleUpdateStatus = async (status: string) => {
+    if (!currentDraft) return;
+    try {
+      // Backend uses PATCH /{iep_id} with IEPUpdateRequest
+      const res = await fetch(`${API}/iep/${currentDraft.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) { const updated = await res.json(); setCurrentDraft(updated); fetchDrafts(selectedStudentId); }
+    } catch {}
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = () => { window.print(); };
+
+  const toggleSection = (section: string) => setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+
+  const card: React.CSSProperties = {
+    background: 'var(--bg-main)', border: '1px solid var(--border-subtle)',
+    borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
   };
 
-  const selectedStudent = students.find(s => s.id === selectedStudentId);
+  const Section = ({ id, title, icon: Icon, children }: { id: string; title: string; icon: any; children: React.ReactNode }) => (
+    <div style={{ marginBottom: '12px', background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', borderRadius: '12px', overflow: 'hidden' }}>
+      <button
+        onClick={() => toggleSection(id)}
+        style={{ width: '100%', padding: '16px 20px', background: expandedSections[id] ? 'var(--color-accent-peach)' : 'var(--bg-surface-alt)', border: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s' }}
+      >
+        <span style={{ fontFamily: 'Outfit', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Icon size={17} style={{ color: 'var(--color-primary)' }} /> {title}
+        </span>
+        {expandedSections[id] ? <ChevronDown size={18} color="var(--color-primary)" /> : <ChevronRight size={18} color="var(--text-secondary)" />}
+      </button>
+      {expandedSections[id] && (
+        <div style={{ padding: '20px 24px', borderTop: '1px solid var(--border-subtle)' }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
 
-  return (
-    <div>
-      <div className="page-header">
-        <h2>
-          <FileText size={24} style={{ marginRight: 8, verticalAlign: 'middle', color: 'var(--color-primary-light)' }} />
-          BEP Taslağı Üretici
-        </h2>
-        <p>AI destekli MEB formatında Bireyselleştirilmiş Eğitim Programı taslağı</p>
+  const renderDraftContent = () => {
+    if (!currentDraft?.content) return (
+      <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+        <p style={{ fontSize: '14px' }}>IEP content is being processed. Please refresh in a moment.</p>
       </div>
+    );
+    const c = currentDraft.content;
+    // Handle case where content might be a string (shouldn't happen but guard anyway)
+    if (typeof c !== 'object') return (
+      <div style={{ padding: '20px', background: 'var(--bg-surface-alt)', borderRadius: '12px', fontSize: '14px', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap' }}>
+        {String(c)}
+      </div>
+    );
 
-      <div className="query-layout">
-        {/* Sol Panel: Form */}
-        <div className="card query-form-card">
-          <form onSubmit={handleGenerate}>
-            <div className="form-group">
-              <label htmlFor="bepStudentSelect">
-                <User size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                Öğrenci Seçin
-              </label>
-              <select id="bepStudentSelect" className="form-select"
-                value={selectedStudentId} onChange={e => handleStudentChange(e.target.value)} required>
-                <option value="">Öğrenci seçiniz...</option>
-                {students.map(s => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} — {DISABILITY_LABELS[s.disability_type] || s.disability_type} — {s.grade_level}. Sınıf
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {selectedStudent && (
-              <div style={{
-                padding: 12, borderRadius: 8, marginBottom: 16,
-                background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
-              }}>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 4 }}>Öğrenci Profili</div>
-                <div style={{ fontSize: '0.9rem' }}>
-                  <strong>{selectedStudent.name}</strong> · {selectedStudent.grade_level}. Sınıf ·{' '}
-                  <span className="badge badge-meb">{DISABILITY_LABELS[selectedStudent.disability_type]}</span>
-                </div>
-                {selectedStudent.competency_notes && (
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-                    📝 {selectedStudent.competency_notes}
-                  </div>
-                )}
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* 1. Student Info */}
+        <Section id="student_info" title="1. Student Information" icon={User}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {[
+              { label: 'Full Name', value: c.student_info?.name || currentDraft.student_name || '—' },
+              { label: 'Disability Type', value: c.student_info?.disability_type || '—' },
+              { label: 'Grade Level', value: c.student_info?.grade_level ? `Grade ${c.student_info.grade_level}` : '—' },
+              { label: 'Educational Diagnosis', value: c.student_info?.educational_diagnosis || '—' },
+            ].map(row => (
+              <div key={row.label}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>{row.label}</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0, fontWeight: 500 }}>{row.value}</p>
+              </div>
+            ))}
+            {c.student_info?.environment_adjustments && (
+              <div style={{ gridColumn: '1 / -1', padding: '12px', background: 'var(--bg-surface-alt)', borderRadius: '8px', borderLeft: '3px solid var(--color-primary)' }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase' }}>Environment Adjustments</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>{c.student_info.environment_adjustments}</p>
               </div>
             )}
+          </div>
+        </Section>
 
-            <div className="form-group">
-              <label htmlFor="bepNotes">Ek Notlar (opsiyonel)</label>
-              <textarea id="bepNotes" className="form-textarea" rows={3}
-                value={additionalNotes} onChange={e => setAdditionalNotes(e.target.value)}
-                placeholder="Örn: Görsel materyallerle daha iyi öğreniyor, ev ortamında pekiştirme gerekiyor..." />
-            </div>
-
-            <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={generating || !selectedStudentId}>
-              <Sparkles size={16} />
-              {generating ? 'BEP Taslağı Üretiliyor...' : 'BEP Taslağı Üret'}
-            </button>
-          </form>
-
-          {/* Önceki Taslaklar */}
-          {drafts.length > 0 && (
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
-              <h4 style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
-                📋 Önceki BEP Taslakları ({drafts.length})
-              </h4>
-              {drafts.map(d => (
-                <div key={d.id}
-                  onClick={() => setCurrentDraft(d)}
-                  style={{
-                    padding: '8px 12px', borderRadius: 6, marginBottom: 6, cursor: 'pointer',
-                    background: currentDraft?.id === d.id ? 'var(--bg-elevated)' : 'transparent',
-                    border: currentDraft?.id === d.id ? '1px solid var(--color-primary)' : '1px solid var(--border-subtle)',
-                    transition: 'all 0.2s ease',
-                  }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>v{d.version}</span>
-                    <span style={{
-                      fontSize: '0.7rem', padding: '2px 6px', borderRadius: 4,
-                      background: STATUS_LABELS[d.status]?.color || 'gray', color: '#fff',
-                    }}>
-                      {STATUS_LABELS[d.status]?.text || d.status}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {new Date(d.created_at).toLocaleDateString('tr-TR')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Sağ Panel: BEP Görünümü */}
-        <div>
-          {generating && (
-            <div className="card">
-              <div className="loading-container">
-                <div className="spinner" />
-                <p>Akademik kaynaklar analiz ediliyor ve BEP taslağı üretiliyor...</p>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Bu işlem 15-30 saniye sürebilir.</p>
+        {/* 2. Performance Assessment */}
+        <Section id="performance" title="2. Present Levels of Performance" icon={BookOpen}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {c.performance_assessment?.development_history && (
+              <div style={{ padding: '14px', background: 'var(--bg-surface-alt)', borderRadius: '10px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px', textTransform: 'uppercase' }}>Development History</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>{c.performance_assessment.development_history}</p>
               </div>
-            </div>
-          )}
+            )}
+            {c.performance_assessment?.areas?.map((area: any, i: number) => (
+              <div key={i} style={{ padding: '14px', background: 'var(--bg-surface-alt)', borderRadius: '10px', borderLeft: '4px solid var(--color-primary)' }}>
+                <h4 style={{ fontFamily: 'Outfit', fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '8px' }}>{area.area_name}</h4>
+                <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.6 }}>{area.performance_level}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
 
-          {error && <div className="alert-error" style={{ marginBottom: 16 }}>{error}</div>}
-
-          {currentDraft && !generating && (
-            <div className="query-answer">
-              {/* Başlık */}
-              <div className="card" style={{ marginBottom: 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* 3. Education Plan */}
+        <Section id="plan" title="3. Annual Goals & Objectives" icon={Target}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {c.education_plan?.map((plan: any, i: number) => (
+              <div key={i} style={{ padding: '16px', background: 'var(--bg-surface-alt)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <h4 style={{ fontFamily: 'Outfit', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{plan.development_area}</h4>
+                  <span style={{ padding: '3px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 700, background: 'var(--color-accent-peach)', color: 'var(--color-primary)' }}>Goal {i + 1}</span>
+                </div>
+                <div style={{ padding: '10px 14px', background: 'var(--bg-main)', borderRadius: '8px', marginBottom: '12px', border: '1px solid var(--color-primary-dim)' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '4px', textTransform: 'uppercase' }}>Annual Goal</p>
+                  <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0, fontWeight: 500 }}>{plan.long_term_goal}</p>
+                </div>
+                {plan.short_term_goals?.length > 0 && (
                   <div>
-                    <h3 style={{ margin: 0 }}>BİREYSELLEŞTİRİLMİŞ EĞİTİM PROGRAMI</h3>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-                      Versiyon {currentDraft.version} · {new Date(currentDraft.created_at).toLocaleDateString('tr-TR')}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="btn-icon" onClick={handlePrint} title="Yazdır">
-                      <Download size={16} />
-                    </button>
-                    <button className="btn-icon" onClick={() => handleGenerate({ preventDefault: () => {} } as FormEvent)} title="Yeniden Üret">
-                      <RefreshCw size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bölüm I: Öğrenci Bilgileri */}
-              {currentDraft.content.student_info && (
-                <div className="card" style={{ marginBottom: 12 }}>
-                  <div onClick={() => toggleSection('student_info')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {expandedSections.student_info ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <h4 style={{ margin: 0 }}>I — Öğrenci Bilgileri</h4>
-                  </div>
-                  {expandedSections.student_info && (
-                    <table className="source-table" style={{ marginTop: 12 }}>
-                      <tbody>
-                        <tr><td style={{ fontWeight: 600, width: '40%' }}>Ad-Soyad</td><td>{currentDraft.content.student_info.name}</td></tr>
-                        <tr><td style={{ fontWeight: 600 }}>Sınıf</td><td>{currentDraft.content.student_info.grade_level}. Sınıf</td></tr>
-                        <tr><td style={{ fontWeight: 600 }}>Eğitsel Tanı</td><td>{currentDraft.content.student_info.educational_diagnosis || currentDraft.content.student_info.disability_type}</td></tr>
-                        {currentDraft.content.student_info.environment_adjustments && (
-                          <tr><td style={{ fontWeight: 600 }}>Ortam Düzenlemeleri</td><td>{currentDraft.content.student_info.environment_adjustments}</td></tr>
-                        )}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              )}
-
-              {/* Bölüm II: Eğitsel Performans */}
-              {currentDraft.content.performance_assessment && (
-                <div className="card" style={{ marginBottom: 12 }}>
-                  <div onClick={() => toggleSection('performance')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {expandedSections.performance ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <h4 style={{ margin: 0 }}>II — Eğitsel Performans Formu</h4>
-                  </div>
-                  {expandedSections.performance && (
-                    <div style={{ marginTop: 12 }}>
-                      {currentDraft.content.performance_assessment.development_history && (
-                        <div style={{ padding: 12, background: 'var(--bg-elevated)', borderRadius: 8, marginBottom: 12 }}>
-                          <div style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: 4 }}>Gelişim Öyküsü</div>
-                          <div style={{ fontSize: '0.9rem' }}>{currentDraft.content.performance_assessment.development_history}</div>
-                        </div>
-                      )}
-                      <table className="source-table">
-                        <thead>
-                          <tr><th>Gelişim Alanı / Ders</th><th>Performans Düzeyi</th></tr>
-                        </thead>
-                        <tbody>
-                          {(currentDraft.content.performance_assessment.areas || []).map((area: any, i: number) => (
-                            <tr key={i}>
-                              <td style={{ fontWeight: 600, minWidth: 160 }}>{area.area_name}</td>
-                              <td>{area.performance_level}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Bölüm III: Eğitim Planı */}
-              {currentDraft.content.education_plan && (
-                <div className="card" style={{ marginBottom: 12 }}>
-                  <div onClick={() => toggleSection('plan')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {expandedSections.plan ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <h4 style={{ margin: 0 }}>III — Bireyselleştirilmiş Eğitim Planı</h4>
-                  </div>
-                  {expandedSections.plan && (
-                    <div style={{ marginTop: 12 }}>
-                      {(currentDraft.content.education_plan || []).map((plan: any, pi: number) => (
-                        <div key={pi} style={{
-                          marginBottom: 16, padding: 16, borderRadius: 8,
-                          border: '1px solid var(--border-subtle)', background: 'var(--bg-elevated)',
-                        }}>
-                          <div style={{ fontWeight: 700, color: 'var(--color-primary-light)', marginBottom: 8 }}>
-                            {plan.development_area}
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px', textTransform: 'uppercase' }}>Short-Term Objectives</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {plan.short_term_goals.map((stg: any, j: number) => (
+                        <div key={j} style={{ padding: '10px 14px', background: 'var(--bg-main)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                          <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: '0 0 6px 0', fontWeight: 500 }}>{stg.goal}</p>
+                          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                            {stg.criterion && <span style={{ fontSize: '12px', color: '#2D936C', fontWeight: 600 }}>✓ {stg.criterion}</span>}
+                            {stg.evaluation_method && <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>📊 {stg.evaluation_method}</span>}
                           </div>
-                          <div style={{ fontSize: '0.9rem', marginBottom: 12 }}>
-                            <strong>Uzun Dönemli Amaç:</strong> {plan.long_term_goal}
-                          </div>
-
-                          {(plan.short_term_goals || []).map((goal: any, gi: number) => (
-                            <div key={gi} style={{
-                              marginBottom: 12, padding: 12, borderRadius: 6,
-                              background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-                            }}>
-                              <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 8 }}>
-                                Kısa Dönemli Amaç {gi + 1}: {goal.goal}
-                              </div>
-                              <table className="source-table" style={{ fontSize: '0.8rem' }}>
-                                <tbody>
-                                  {goal.behaviors?.length > 0 && (
-                                    <tr><td style={{ fontWeight: 600, width: '30%' }}>Davranışlar</td><td>{goal.behaviors.join(', ')}</td></tr>
-                                  )}
-                                  <tr><td style={{ fontWeight: 600 }}>Ölçüt</td><td>{goal.criterion}</td></tr>
-                                  {goal.methods?.length > 0 && (
-                                    <tr><td style={{ fontWeight: 600 }}>Yöntem/Teknik</td><td>{goal.methods.join(', ')}</td></tr>
-                                  )}
-                                  {goal.materials?.length > 0 && (
-                                    <tr><td style={{ fontWeight: 600 }}>Materyaller</td><td>{goal.materials.join(', ')}</td></tr>
-                                  )}
-                                  <tr><td style={{ fontWeight: 600 }}>Değerlendirme</td><td>{goal.evaluation_method} — {goal.evaluation_dates}</td></tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          ))}
-
-                          {plan.environment_adjustments && (
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 8 }}>
-                              🏫 Ortam Düzenlemesi: {plan.environment_adjustments}
-                            </div>
-                          )}
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-              )}
-
-              {/* Bölüm IV: BEP Birim Kararları */}
-              {currentDraft.content.unit_decisions && (
-                <div className="card" style={{ marginBottom: 12 }}>
-                  <div onClick={() => toggleSection('decisions')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {expandedSections.decisions ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <h4 style={{ margin: 0 }}>IV — BEP Geliştirme Birim Kararları</h4>
                   </div>
-                  {expandedSections.decisions && (
-                    <div style={{ marginTop: 12 }}>
-                      {(currentDraft.content.unit_decisions.school_services || []).length > 0 && (
-                        <table className="source-table" style={{ marginBottom: 12 }}>
-                          <thead>
-                            <tr><th>Hizmet Türü</th><th>Alan/Ders</th><th>Haftalık Süre</th><th>Sorumlu</th></tr>
-                          </thead>
-                          <tbody>
-                            {currentDraft.content.unit_decisions.school_services.map((s: any, i: number) => (
-                              <tr key={i}>
-                                <td>{s.service_type}</td>
-                                <td>{s.area}</td>
-                                <td>{s.weekly_hours} saat</td>
-                                <td>{s.responsible}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
-                      <div style={{ fontSize: '0.85rem' }}>
-                        <p><strong>Aile Bilgilendirme Sıklığı:</strong> {currentDraft.content.unit_decisions.family_info_frequency}</p>
-                        <p><strong>Bilgilendirme Yöntemi:</strong> {currentDraft.content.unit_decisions.family_info_method}</p>
-                        <p><strong>Aile Eğitimi:</strong> {currentDraft.content.unit_decisions.family_education ? 'Evet' : 'Hayır'}</p>
-                        {currentDraft.content.unit_decisions.family_education_method && (
-                          <p><strong>Aile Eğitimi Yöntemi:</strong> {currentDraft.content.unit_decisions.family_education_method}</p>
-                        )}
-                      </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* 4. Unit Decisions */}
+        {c.unit_decisions && (
+          <Section id="decisions" title="4. Unit Decisions & Support Services" icon={Building}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              {[
+                { label: 'Family Info Frequency', value: c.unit_decisions.family_info_frequency },
+                { label: 'Info Method', value: c.unit_decisions.family_info_method },
+                { label: 'Family Education', value: c.unit_decisions.family_education ? 'Yes' : 'No' },
+                { label: 'Education Method', value: c.unit_decisions.family_education_method },
+              ].filter(r => r.value).map(row => (
+                <div key={row.label}>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>{row.label}</p>
+                  <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0 }}>{String(row.value)}</p>
+                </div>
+              ))}
+            </div>
+            {c.unit_decisions.school_services?.length > 0 && (
+              <div style={{ marginTop: '16px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>School Services</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {c.unit_decisions.school_services.map((svc: any, i: number) => (
+                    <div key={i} style={{ padding: '10px 14px', background: 'var(--bg-surface-alt)', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>{svc.service_type}</span>
+                      {svc.area && <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{svc.area}</span>}
+                      {svc.weekly_hours && <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-primary)', padding: '2px 8px', background: 'var(--color-accent-peach)', borderRadius: '999px' }}>{svc.weekly_hours}h/week</span>}
+                      {svc.responsible && <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>by {svc.responsible}</span>}
                     </div>
-                  )}
+                  ))}
+                </div>
+              </div>
+            )}
+          </Section>
+        )}
+      </div>
+    );
+  };
+
+  const selectedStudent = students.find(s => s.id === selectedStudentId);
+  const statusInfo = currentDraft ? (STATUS[currentDraft.status] ?? STATUS.draft) : null;
+
+  return (
+    <main className="page-content" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '28px' }}>
+        <h1 style={{ fontFamily: 'Outfit', fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>AI IEP Generator</h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Draft Individualized Education Programs aligned with MEB standards using AI.</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 360px) 1fr', gap: '28px', alignItems: 'start' }}>
+        {/* Left: Form */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={card}>
+            <h3 style={{ fontFamily: 'Outfit', fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={18} style={{ color: 'var(--color-primary)' }} /> Generate New IEP
+            </h3>
+            <form onSubmit={handleGenerate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Select Student</label>
+                <select className="form-select" style={{ width: '100%' }} value={selectedStudentId} onChange={e => handleStudentChange(e.target.value)} required>
+                  <option value="">— Choose a student —</option>
+                  {students.map(s => <option key={s.id} value={s.id}>{s.name} ({DISABILITY_LABELS[s.disability_type] || s.disability_type})</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teacher Notes (Optional)</label>
+                <textarea className="form-textarea" rows={4} style={{ width: '100%', boxSizing: 'border-box' }} placeholder="E.g., Student has improved in math but struggles with peer interaction..."
+                  value={additionalNotes} onChange={e => setAdditionalNotes(e.target.value)} />
+              </div>
+              {selectedStudent && (
+                <div style={{ padding: '12px 14px', background: 'var(--color-accent-peach)', borderRadius: '10px', border: '1px solid var(--color-primary-dim)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <User size={18} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-primary)' }}>{selectedStudent.name}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{DISABILITY_LABELS[selectedStudent.disability_type]} · Grade {selectedStudent.grade_level}</div>
+                  </div>
                 </div>
               )}
+              <button type="submit" className="btn-primary" disabled={generating || !selectedStudentId}>
+                {generating ? <><RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} /> Generating AI IEP...</> : <><Sparkles size={16} /> Generate with AI</>}
+              </button>
+              {error && <div style={{ padding: '10px 14px', background: '#FDE8E8', borderRadius: '8px', fontSize: '13px', color: 'var(--color-danger)' }}>{error}</div>}
+            </form>
+          </div>
+
+          {/* Draft History */}
+          {drafts.length > 0 && (
+            <div style={card}>
+              <h3 style={{ fontFamily: 'Outfit', fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>Draft History</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {drafts.map(draft => {
+                  const s = STATUS[draft.status] ?? STATUS.draft;
+                  const isActive = currentDraft?.id === draft.id;
+                  return (
+                    <button key={draft.id} onClick={() => setCurrentDraft(draft)} style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', borderRadius: '10px',
+                      border: `1px solid ${isActive ? 'var(--color-primary)' : 'var(--border-subtle)'}`,
+                      background: isActive ? 'var(--color-accent-peach)' : 'var(--bg-surface-alt)',
+                      cursor: 'pointer', textAlign: 'left', width: '100%', transition: 'all 0.15s',
+                    }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Version {draft.version}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{new Date(draft.created_at).toLocaleString()}</div>
+                      </div>
+                      <span style={{ padding: '3px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 700, background: s.bg, color: s.color }}>{s.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
+        </div>
 
-          {/* Empty State */}
-          {!generating && !currentDraft && !error && (
-            <div className="card empty-state">
-              <div className="empty-icon"><FileText size={48} /></div>
-              <h3>BEP Taslağı Üretin</h3>
-              <p>Soldaki formdan öğrenci seçip "BEP Taslağı Üret" butonuna basın.<br />
-                AI, MEB formatına uygun bireyselleştirilmiş eğitim programı taslağı oluşturacaktır.</p>
+        {/* Right: Preview */}
+        <div style={card}>
+          {!currentDraft ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '480px', textAlign: 'center' }}>
+              <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'var(--color-accent-peach)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                <FileText size={36} style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <h3 style={{ fontFamily: 'Outfit', fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>No IEP Selected</h3>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)', maxWidth: '320px' }}>Select a student and generate an AI-powered IEP, or click a draft from history.</p>
+            </div>
+          ) : (
+            <div>
+              {/* Draft Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--border-subtle)' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                    <h2 style={{ fontFamily: 'Outfit', fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>IEP Draft v{currentDraft.version}</h2>
+                    {statusInfo && <span style={{ padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 700, background: statusInfo.bg, color: statusInfo.color }}>{statusInfo.text}</span>}
+                  </div>
+                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
+                    Student: <strong style={{ color: 'var(--text-primary)' }}>{currentDraft.student_name || currentDraft.content?.student_info?.name || '—'}</strong>
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {currentDraft.status === 'draft' && (
+                    <button className="btn-primary" onClick={() => handleUpdateStatus('reviewed')} style={{ width: 'auto', padding: '8px 16px' }}>
+                      <FileCheck size={15} /> Mark Reviewed
+                    </button>
+                  )}
+                  {currentDraft.status === 'reviewed' && (
+                    <button onClick={() => handleUpdateStatus('finalized')} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#2D936C', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
+                      <Check size={15} /> Finalize IEP
+                    </button>
+                  )}
+                  <button onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: 'var(--bg-surface-alt)', border: '1px solid var(--border-subtle)', borderRadius: '8px', fontWeight: 600, fontSize: '13px', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                    <Printer size={15} /> Print
+                  </button>
+                </div>
+              </div>
+              {renderDraftContent()}
             </div>
           )}
         </div>
       </div>
-    </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </main>
   );
 }
