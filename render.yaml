@@ -1,0 +1,119 @@
+# ============================================================
+# EduRAG — Render Blueprint (render.yaml)
+# ============================================================
+# Bu dosya Render'a tüm servisleri tek seferde tanımlar.
+# Kullanım:
+#   Render Dashboard → New → Blueprint → Bu repo → Apply
+#
+# Belgeler: https://render.com/docs/blueprint-spec
+# ============================================================
+
+services:
+
+  # ── Backend Web Service ─────────────────────────────────────
+  - type: web
+    name: edurag-backend
+    runtime: docker
+
+    # Dockerfile konumu (repo kökünden bakılır)
+    dockerfilePath: ./backend/Dockerfile
+
+    # Hangi branch'ten build alınsın
+    branch: main
+
+    # Frankfurt bölgesi → KVKK uyumu (Avrupa)
+    region: frankfurt
+
+    # Free tier: 0.1 CPU, 512 MB RAM
+    # 15 dk hareketsizlik → uyku moduna geçer (free tier sınırı)
+    plan: free
+
+    # Health check — Render bu endpoint'i izler
+    # 200 gelirse "Live", gelmezse "Unhealthy" → yeniden deploy
+    healthCheckPath: /health
+
+    # Ortam değişkenleri
+    envVars:
+      # Veritabanı bağlantısı — Render otomatik enjekte eder
+      - key: DATABASE_URL
+        fromDatabase:
+          name: edurag-db
+          property: connectionString
+
+      # LangSmith tracing — kod değişikliği gerektirmez
+      - key: LANGCHAIN_TRACING_V2
+        value: "true"
+      - key: LANGCHAIN_PROJECT
+        value: edurag-production
+
+      # Uygulama ayarları
+      - key: APP_NAME
+        value: EduRAG
+      - key: DEBUG
+        value: "false"
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "15"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+      - key: COSINE_THRESHOLD
+        value: "0.70"
+      - key: WEB_SEARCH_ENABLED
+        value: "true"
+      - key: LLM_MODEL
+        value: llama-3.3-70b-versatile
+      - key: WHISPER_MODEL
+        value: whisper-large-v3-turbo
+      - key: EMBEDDING_MODEL
+        value: intfloat/multilingual-e5-large
+
+      # ── SECRET'LAR — Dashboard'dan elle girilecek ──
+      # sync: false → render.yaml'a değer yazılmaz, güvenli
+      - key: SECRET_KEY
+        generateValue: true       # Render rastgele üretir → güvenli
+      - key: GROQ_API_KEY
+        sync: false               # Dashboard → Environment → Elle gir
+      - key: HUGGINGFACEHUB_API_TOKEN
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: LANGCHAIN_API_KEY
+        sync: false
+
+  # ── Frontend Static Site ────────────────────────────────────
+  - type: static
+    name: edurag-frontend
+    branch: main
+    region: frankfurt
+    plan: free
+
+    # Frontend klasöründe build komutu çalıştır
+    buildCommand: cd frontend && npm ci && npm run build
+
+    # Build çıktısı → CDN'e yükle
+    staticPublishPath: ./frontend/dist
+
+    # SPA için: Bilinmeyen URL'ler → index.html (React Router)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+    envVars:
+      # Backend URL — frontend build sırasında enjekte edilir
+      # Render'ın backend servis URL'ini buraya yaz:
+      - key: VITE_API_URL
+        value: https://edurag-backend.onrender.com/api/v1
+
+# ── Managed PostgreSQL ──────────────────────────────────────
+databases:
+  - name: edurag-db
+    databaseName: edurag_db
+    user: edurag
+    plan: free            # 1 GB depolama, 97 bağlantı
+    region: frankfurt     # Backend ile aynı bölge → düşük latency
+
+    # Not: pgvector extension Render PostgreSQL 16'da built-in gelir.
+    # Alembic migration'da: CREATE EXTENSION IF NOT EXISTS vector;
+    # Bu satır zaten migration dosyasında olmalı.

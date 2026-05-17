@@ -1,0 +1,72 @@
+# ============================================================
+# EduRAG — Docker Compose (Local Development)
+# ============================================================
+# BU DOSYA: Sadece yerel geliştirme içindir.
+# Production: Render.com managed services kullanılır.
+#             DB → Render Managed PostgreSQL
+#             Backend → Render Web Service (Docker)
+#
+# Kullanım:
+#   docker compose up -d          → Tüm servisleri başlat
+#   docker compose logs -f        → Log'ları izle
+#   docker compose down           → Servisleri durdur
+#   docker compose down -v        → Servisleri + volume'ları sil
+# ============================================================
+
+services:
+
+  # ── PostgreSQL + pgvector ──────────────────────────────────
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: edurag_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-edurag}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-edurag123}
+      POSTGRES_DB: ${POSTGRES_DB:-edurag_db}
+    volumes:
+      # Named volume → container silinse bile veri korunur
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Host port 5433 → Container port 5432
+      # 5433 seçildi: Sistemde kurulu PostgreSQL varsa 5432 çakışmasın
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-edurag} -d ${POSTGRES_DB:-edurag_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── FastAPI Backend ────────────────────────────────────────
+  backend:
+    build:
+      context: .           # backend/ klasörü (docker compose backend/ klasöründen çalışır)
+      dockerfile: Dockerfile
+    container_name: edurag_backend
+    env_file:
+      - .env               # Backend .env dosyasını yükle
+    environment:
+      # Docker Compose ağında db servisine "db" hostname ile erişilir
+      # .env'deki DATABASE_URL'i override et:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-edurag}:${POSTGRES_PASSWORD:-edurag123}@db:5432/${POSTGRES_DB:-edurag_db}
+    volumes:
+      # Upload edilen PDF'ler ve üretilen materyaller kalıcı olsun
+      - uploads:/app/uploads
+      - static:/app/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy   # DB hazır olmadan backend başlamaz
+    restart: unless-stopped
+
+volumes:
+  # Named volumes — "docker compose down" ile SİLİNMEZ
+  # "docker compose down -v" ile silinir (dikkat!)
+  postgres_data:
+    driver: local
+  uploads:
+    driver: local
+  static:
+    driver: local

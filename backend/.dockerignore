@@ -1,0 +1,65 @@
+# ============================================================
+# EduRAG — .dockerignore
+# ============================================================
+# Docker build context'ine GÖNDERİLMEYECEK dosyalar.
+# Neden önemli?
+#   - Image boyutu küçülür
+#   - Build hızı artar
+#   - Gizli dosyalar (.env) image'a girmez → Güvenlik
+# ============================================================
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Test ve geliştirme araçları
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# IDE dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Gizli ortam değişkenleri — ASLA image'a girmesin!
+.env
+.env.*
+!.env.example
+
+# Egg-info (pip install -e artifacts)
+*.egg-info/
+dist/
+build/
+
+# Upload ve static — runtime'da volume'dan gelir
+uploads/
+static/
+
+# OS dosyaları
+.DS_Store
+Thumbs.db
+
+# Log dosyaları
+*.log
+logs/
+
+# Alembic cache (versions klasörü hariç)
+alembic/__pycache__/
