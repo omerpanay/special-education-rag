@@ -27,39 +27,39 @@ class Settings(BaseSettings):
     )
 
     # ── Veritabanı ──
-    database_url: str = "postgresql+asyncpg://postgres:sifrem123@localhost:5433/edurag"
+    database_url: str 
 
     # ── LLM (Groq) ──
     groq_api_key: str
-    llm_model: str = "llama-3.3-70b-versatile"
+    llm_model: str
 
     # ── Embedding ──
-    embedding_model: str = "intfloat/multilingual-e5-large"
+    embedding_model: str 
 
     # ── RAG Ayarları ──
     # Constitution İlkesi I: Zero-Hallucination
     # Bu eşiğin altındaki sonuçlar kullanıcıya gösterilmez
-    cosine_threshold: float = 0.70
+    cosine_threshold: float 
 
     # ── Güvenlik ──
     secret_key: str  # .env'de tanımlanması zorunlu — varsayılan yok
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 15
-    refresh_token_expire_days: int = 7
+    algorithm: str 
+    access_token_expire_minutes: int 
+    refresh_token_expire_days: int 
 
     # ── Uygulama ──
     app_name: str = "EduRAG"
     debug: bool = False
 
     # ── Agentic RAG (Faz 1) ──
-    tavily_api_key: str = ""            # Yoksa web arama devre dışı kalır
-    web_search_enabled: bool = True     # Feature flag
+    tavily_api_key: str           # Yoksa web arama devre dışı kalır
+    web_search_enabled: bool    # Feature flag
 
     # ── HuggingFace (Faz 3) ──
     huggingface_api_token: str = ""
 
     # ── Whisper STT (Faz 2) ──
-    whisper_model: str = "whisper-large-v3-turbo"
+    whisper_model: str 
 
 
 @lru_cache

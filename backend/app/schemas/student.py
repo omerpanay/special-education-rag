@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class StudentCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    disability_type: str = Field(..., description="disleksi | zihin_yetersizligi | otizm")
+    disability_type: str = Field(..., description="disleksi | ogrenme_yetersizligi | otizm")
     grade_level: int = Field(..., ge=1, le=12)
     competency_notes: Optional[str] = None
 
