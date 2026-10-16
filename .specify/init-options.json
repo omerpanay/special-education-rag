@@ -1,10 +1,12 @@
 {
   "ai": "agy",
   "ai_skills": true,
+  "allow_symlinks": false,
   "branch_numbering": "sequential",
   "context_file": "AGENTS.md",
+  "feature_numbering": "sequential",
   "here": true,
   "integration": "agy",
   "script": "ps",
-  "speckit_version": "0.8.2.dev0"
+  "speckit_version": "1.2.1.dev0"
 }

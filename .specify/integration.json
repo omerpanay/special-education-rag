@@ -1,4 +1,15 @@
 {
+  "version": "1.2.1.dev0",
+  "integration_state_schema": 1,
+  "installed_integrations": [
+    "agy"
+  ],
+  "integration_settings": {
+    "agy": {
+      "script": "ps",
+      "invoke_separator": "-"
+    }
+  },
   "integration": "agy",
-  "version": "0.8.2.dev0"
+  "default_integration": "agy"
 }
